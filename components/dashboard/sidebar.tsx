@@ -17,24 +17,6 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from "@/components/theme-toggle";
 
-const projects = [
-  {
-    id: 1,
-    name: "Project 1",
-    dueDate: new Date("2025-08-20"),
-  },
-  {
-    id: 2,
-    name: "Project 2",
-    dueDate: new Date("2025-08-25"),
-  },
-  {
-    id: 3,
-    name: "Project 3",
-    dueDate: new Date("2025-09-01"),
-  },
-].sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime());
-
 export function Sidebar() {
   return (
     <Card className="w-80 h-screen flex flex-col">
@@ -59,14 +41,7 @@ export function Sidebar() {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              {projects.map((project) => (
-                <div key={project.id} className="flex justify-between items-center">
-                  <p>{project.name}</p>
-                  <p className="text-sm text-gray-500">
-                    {project.dueDate.toLocaleDateString()}
-                  </p>
-                </div>
-              ))}
+              <p>View your projects here.</p>
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-2">

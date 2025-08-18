@@ -23,6 +23,7 @@ model Area {
   id          Int       @id @default(autoincrement())
   name        String
   description String?
+  priority    Int       @default(2)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   resources   Resource[]
@@ -57,6 +58,7 @@ model Task {
   name        String
   description String?
   status      String    @default("todo")
+  priority    Int       @default(2)
   dueDate     DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
