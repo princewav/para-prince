@@ -1,15 +1,67 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-generator client {
-  provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Project {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  status      String    @default("active")
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  resources   Resource[]
+  tasks       Task[]
+}
+
+model Area {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  resources   Resource[]
+  tasks       Task[]
+}
+
+model Resource {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  type        String?
+  url         String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  project     Project?  @relation(fields: [projectId], references: [id])
+  projectId   Int?
+  area        Area?     @relation(fields: [areaId], references: [id])
+  areaId      Int?
+}
+
+model Archive {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  type        String?
+  originalId  Int?
+  archivedAt  DateTime  @default(now())
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  status      String    @default("todo")
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  project     Project?  @relation(fields: [projectId], references: [id])
+  projectId   Int?
+  area        Area?     @relation(fields: [areaId], references: [id])
+  areaId      Int?
 }
