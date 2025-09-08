@@ -29,9 +29,9 @@ export default function ProjectPage() {
   ]);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskDueDate, setNewTaskDueDate] = useState("");
-  const [newTaskPriority, setNewTaskPriority] = useState<string | null>("P3");
-  const [newTaskEnergy, setNewTaskEnergy] = useState<string | null>("Medium");
-  const [newTaskContext, setNewTaskContext] = useState<string | null>("@computer");
+  const [newTaskPriority, setNewTaskPriority] = useState<string | null>(null);
+  const [newTaskEnergy, setNewTaskEnergy] = useState<string | null>(null);
+  const [newTaskContext, setNewTaskContext] = useState<string | null>(null);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState<number | null>(null);
   const [editingField, setEditingField] = useState<string | null>(null);
@@ -98,9 +98,9 @@ export default function ProjectPage() {
       
       setNewTaskName("");
       setNewTaskDueDate("");
-      setNewTaskPriority("P3");
-      setNewTaskEnergy("Medium");
-      setNewTaskContext("@computer");
+      setNewTaskPriority(null);
+      setNewTaskEnergy(null);
+      setNewTaskContext(null);
       setIsAddingTask(false);
     }
   };
@@ -108,9 +108,9 @@ export default function ProjectPage() {
   const handleCancelAdd = () => {
     setNewTaskName("");
     setNewTaskDueDate("");
-    setNewTaskPriority("P3");
-    setNewTaskEnergy("Medium");
-    setNewTaskContext("@computer");
+    setNewTaskPriority(null);
+    setNewTaskEnergy(null);
+    setNewTaskContext(null);
     setIsAddingTask(false);
   };
 
@@ -400,7 +400,7 @@ export default function ProjectPage() {
                             (e.target as HTMLInputElement).value
                           )
                         }
-                        className="border border-border/40 shadow-none focus-visible:ring-0 focus-visible:border-ring px-2 py-2 bg-transparent h-8 w-36 min-w-0 rounded-md"
+                        className="relative border border-border/40 shadow-none focus-visible:ring-0 focus-visible:border-ring px-2 py-2 bg-transparent h-8 w-36 min-w-0 rounded-md [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-2"
                         autoFocus
                       />
                     ) : (
@@ -555,14 +555,14 @@ export default function ProjectPage() {
                       value={newTaskDueDate}
                       onChange={(e) => setNewTaskDueDate(e.target.value)}
                       onKeyDown={handleKeyPress}
-                      className="border border-border/40 shadow-none focus-visible:ring-0 focus-visible:border-ring px-2 py-2 w-32 bg-transparent text-sm h-8 rounded-md"
+                      className="relative border border-border/40 shadow-none focus-visible:ring-0 focus-visible:border-ring px-2 py-2 w-32 bg-transparent text-sm h-8 rounded-md [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-2"
                       placeholder="Optional"
                     />
                   </td>
                   <td className="p-1 h-14 align-middle leading-none text-center">
                     <Select
-                      value={newTaskPriority}
-                      onValueChange={setNewTaskPriority}
+                      value={newTaskPriority || "none"}
+                      onValueChange={(value) => setNewTaskPriority(value === "none" ? null : value)}
                     >
                       <SelectTrigger className="w-16 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0 text-center mx-auto">
                         <SelectValue />
@@ -577,8 +577,8 @@ export default function ProjectPage() {
                   </td>
                   <td className="p-1 h-14 align-middle leading-none text-center">
                     <Select
-                      value={newTaskEnergy}
-                      onValueChange={setNewTaskEnergy}
+                      value={newTaskEnergy || "none"}
+                      onValueChange={(value) => setNewTaskEnergy(value === "none" ? null : value)}
                     >
                       <SelectTrigger className="w-20 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0 text-center mx-auto">
                         <SelectValue />
@@ -593,8 +593,8 @@ export default function ProjectPage() {
                   </td>
                   <td className="p-1 h-14 align-middle leading-none text-center">
                     <Select
-                      value={newTaskContext}
-                      onValueChange={setNewTaskContext}
+                      value={newTaskContext || "none"}
+                      onValueChange={(value) => setNewTaskContext(value === "none" ? null : value)}
                     >
                       <SelectTrigger className="w-24 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0 text-center mx-auto">
                         <SelectValue />
