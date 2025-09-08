@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Calendar, AlertCircle, Flag, Plus, FileText, Check, List, Zap, MapPin } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function ProjectPage() {
   const router = useRouter();
@@ -35,6 +35,7 @@ export default function ProjectPage() {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState<number | null>(null);
   const [editingField, setEditingField] = useState<string | null>(null);
+  const addTaskRowRef = useRef<HTMLTableRowElement>(null);
 
   const sortTasks = (tasksToSort: typeof tasks) => {
     const priorityOrder: Record<string, number> = { P1: 1, P2: 2, P3: 3 };
@@ -61,6 +62,23 @@ export default function ProjectPage() {
   useEffect(() => {
     setTasks(currentTasks => sortTasks(currentTasks));
   }, []);
+
+  // Handle click outside to dismiss add task form
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isAddingTask && addTaskRowRef.current && !addTaskRowRef.current.contains(event.target as Node)) {
+        handleCancelAdd();
+      }
+    };
+
+    if (isAddingTask) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isAddingTask]);
 
   const handleAddTask = () => {
     if (newTaskName) {
@@ -308,13 +326,13 @@ export default function ProjectPage() {
             <tbody>
               {tasks.map((task) => (
                 <tr key={task.id} className="border-b last:border-b-0">
-                  <td className="px-3 py-2 h-10 align-middle leading-none text-center">
+                  <td className="p-1 h-14 align-middle leading-none text-center">
                     <Checkbox
                       checked={task.completed}
                       onCheckedChange={() => handleToggleTask(task.id)}
                     />
                   </td>
-                  <td className="px-3 py-2 h-10 align-middle leading-none text-center">
+                  <td className="p-1 h-14 align-middle leading-none text-center">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -329,7 +347,7 @@ export default function ProjectPage() {
                     </Button>
                   </td>
                   <td
-                    className={`px-3 py-2 h-10 align-middle leading-none w-48 ${
+                    className={`p-1 h-14 align-middle leading-none w-48 ${
                       task.completed ? "line-through text-muted-foreground" : ""
                     }`}
                     onClick={() => startEditing(task.id, "name")}
@@ -349,7 +367,7 @@ export default function ProjectPage() {
                             (e.target as HTMLInputElement).value
                           )
                         }
-                        className="border-none shadow-none focus-visible:ring-0 px-2 py-0 bg-transparent h-5 w-full min-w-0"
+                        className="border border-border/40 shadow-none focus-visible:ring-0 focus-visible:border-ring px-2 py-2 bg-transparent h-8 w-full min-w-0 rounded-md"
                         autoFocus
                       />
                     ) : (
@@ -361,7 +379,7 @@ export default function ProjectPage() {
                     )}
                   </td>
                   <td
-                    className={`px-3 py-2 h-10 align-middle leading-none ${
+                    className={`p-1 h-14 align-middle leading-none ${
                       task.completed ? "line-through text-muted-foreground" : ""
                     }`}
                     onClick={() => startEditing(task.id, "dueDate")}
@@ -382,7 +400,7 @@ export default function ProjectPage() {
                             (e.target as HTMLInputElement).value
                           )
                         }
-                        className="border-none shadow-none focus-visible:ring-0 px-2 py-0 bg-transparent h-5 w-36 min-w-0"
+                        className="border border-border/40 shadow-none focus-visible:ring-0 focus-visible:border-ring px-2 py-2 bg-transparent h-8 w-36 min-w-0 rounded-md"
                         autoFocus
                       />
                     ) : (
@@ -401,7 +419,7 @@ export default function ProjectPage() {
                     )}
                   </td>
                   <td
-                    className="px-3 py-2 h-10 align-middle leading-none text-center"
+                    className="p-1 h-14 align-middle leading-none text-center"
                     onClick={() => startEditing(task.id, "priority")}
                   >
                     {editingTask === task.id && editingField === "priority" ? (
@@ -412,7 +430,7 @@ export default function ProjectPage() {
                           stopEditing();
                         }}
                       >
-                        <SelectTrigger className="w-16 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0">
+                        <SelectTrigger className="w-16 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0 text-center mx-auto">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -437,7 +455,7 @@ export default function ProjectPage() {
                     )}
                   </td>
                   <td
-                    className="px-3 py-2 h-10 align-middle leading-none text-center"
+                    className="p-1 h-14 align-middle leading-none text-center"
                     onClick={() => startEditing(task.id, "energy")}
                   >
                     {editingTask === task.id && editingField === "energy" ? (
@@ -448,7 +466,7 @@ export default function ProjectPage() {
                           stopEditing();
                         }}
                       >
-                        <SelectTrigger className="w-20 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0">
+                        <SelectTrigger className="w-20 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0 text-center mx-auto">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -473,7 +491,7 @@ export default function ProjectPage() {
                     )}
                   </td>
                   <td
-                    className="px-3 py-2 h-10 align-middle leading-none text-center"
+                    className="p-1 h-14 align-middle leading-none text-center"
                     onClick={() => startEditing(task.id, "context")}
                   >
                     {editingTask === task.id && editingField === "context" ? (
@@ -484,7 +502,7 @@ export default function ProjectPage() {
                           stopEditing();
                         }}
                       >
-                        <SelectTrigger className="w-24 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0">
+                        <SelectTrigger className="w-24 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0 text-center mx-auto">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -512,41 +530,41 @@ export default function ProjectPage() {
                 </tr>
               ))}
               {isAddingTask && (
-                <tr className="border-b-0 bg-muted/20">
-                  <td className="px-3 py-2 h-10 align-middle leading-none text-center">
+                <tr ref={addTaskRowRef} className="border-b-0 bg-muted/20">
+                  <td className="p-1 h-14 align-middle leading-none text-center">
                     <div className="w-4 h-4 rounded-sm border-2 border-dashed border-muted-foreground/40 mx-auto"></div>
                   </td>
-                  <td className="px-3 py-2 h-10 align-middle leading-none text-center">
+                  <td className="p-1 h-14 align-middle leading-none text-center">
                     <div className="w-6 h-6 rounded border border-dashed border-muted-foreground/40 flex items-center justify-center mx-auto">
                       <FileText className="h-3 w-3 text-muted-foreground/40" />
                     </div>
                   </td>
-                  <td className="px-3 py-2 h-10 align-middle leading-none w-48">
+                  <td className="p-1 h-14 align-middle leading-none w-48">
                     <Input
                       placeholder="Enter task name..."
                       value={newTaskName}
                       onChange={(e) => setNewTaskName(e.target.value)}
                       onKeyDown={handleKeyPress}
-                      className="border-none shadow-none focus-visible:ring-0 px-2 py-0 bg-transparent placeholder:text-muted-foreground/60 h-5 w-full"
+                      className="border border-border/40 shadow-none focus-visible:ring-0 focus-visible:border-ring px-2 py-2 bg-transparent placeholder:text-muted-foreground/60 h-8 w-full rounded-md"
                       autoFocus
                     />
                   </td>
-                  <td className="px-3 py-2 h-10 align-middle leading-none">
+                  <td className="p-1 h-14 align-middle leading-none">
                     <Input
                       type="date"
                       value={newTaskDueDate}
                       onChange={(e) => setNewTaskDueDate(e.target.value)}
                       onKeyDown={handleKeyPress}
-                      className="border-none shadow-none focus-visible:ring-0 px-2 py-0 w-32 bg-transparent text-sm h-5"
+                      className="border border-border/40 shadow-none focus-visible:ring-0 focus-visible:border-ring px-2 py-2 w-32 bg-transparent text-sm h-8 rounded-md"
                       placeholder="Optional"
                     />
                   </td>
-                  <td className="px-3 py-2 h-10 align-middle leading-none text-center">
+                  <td className="p-1 h-14 align-middle leading-none text-center">
                     <Select
                       value={newTaskPriority}
                       onValueChange={setNewTaskPriority}
                     >
-                      <SelectTrigger className="w-16 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0">
+                      <SelectTrigger className="w-16 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0 text-center mx-auto">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -557,12 +575,12 @@ export default function ProjectPage() {
                       </SelectContent>
                     </Select>
                   </td>
-                  <td className="px-3 py-2 h-10 align-middle leading-none text-center">
+                  <td className="p-1 h-14 align-middle leading-none text-center">
                     <Select
                       value={newTaskEnergy}
                       onValueChange={setNewTaskEnergy}
                     >
-                      <SelectTrigger className="w-20 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0">
+                      <SelectTrigger className="w-20 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0 text-center mx-auto">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -573,40 +591,22 @@ export default function ProjectPage() {
                       </SelectContent>
                     </Select>
                   </td>
-                  <td className="px-3 py-2 h-10 align-middle leading-none">
-                    <div className="flex gap-2 items-center">
-                      <Select
-                        value={newTaskContext}
-                        onValueChange={setNewTaskContext}
-                      >
-                        <SelectTrigger className="w-24 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">—</SelectItem>
-                          <SelectItem value="@home">@home</SelectItem>
-                          <SelectItem value="@computer">@computer</SelectItem>
-                          <SelectItem value="@calls">@calls</SelectItem>
-                          <SelectItem value="@errands">@errands</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        size="sm"
-                        onClick={handleAddTask}
-                        disabled={!newTaskName}
-                        className="h-7 px-3"
-                      >
-                        Save
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={handleCancelAdd}
-                        className="h-7 px-3 text-muted-foreground hover:text-foreground"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
+                  <td className="p-1 h-14 align-middle leading-none text-center">
+                    <Select
+                      value={newTaskContext}
+                      onValueChange={setNewTaskContext}
+                    >
+                      <SelectTrigger className="w-24 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0 text-center mx-auto">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">—</SelectItem>
+                        <SelectItem value="@home">@home</SelectItem>
+                        <SelectItem value="@computer">@computer</SelectItem>
+                        <SelectItem value="@calls">@calls</SelectItem>
+                        <SelectItem value="@errands">@errands</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </td>
                 </tr>
               )}
