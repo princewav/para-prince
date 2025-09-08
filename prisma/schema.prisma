@@ -8,13 +8,14 @@ generator client {
 }
 
 model Project {
-  id          Int       @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   name        String
   description String?
-  status      String    @default("active")
+  status      ProjectStatus @default(IN_PROGRESS)
+  priority    Priority?
   dueDate     DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   resources   Resource[]
   tasks       Task[]
 }
@@ -23,7 +24,7 @@ model Area {
   id          Int       @id @default(autoincrement())
   name        String
   description String?
-  priority    Int       @default(2)
+  priority    Priority  @default(P2)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   resources   Resource[]
@@ -45,25 +46,70 @@ model Resource {
 }
 
 model Archive {
-  id          Int       @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   name        String
   description String?
-  type        String?
-  originalId  Int?
-  archivedAt  DateTime  @default(now())
+  type        ArchiveType
+  originalId  Int
+  archivedAt  DateTime    @default(now())
+  archivedData Json?
 }
 
 model Task {
-  id          Int       @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   name        String
   description String?
-  status      String    @default("todo")
-  priority    Int       @default(2)
+  status      TaskStatus  @default(TODO)
+  priority    Priority?
+  energy      Energy?
+  context     Context?
+  notes       String?
   dueDate     DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  project     Project?  @relation(fields: [projectId], references: [id])
+  completed   Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  project     Project?    @relation(fields: [projectId], references: [id])
   projectId   Int?
-  area        Area?     @relation(fields: [areaId], references: [id])
+  area        Area?       @relation(fields: [areaId], references: [id])
   areaId      Int?
+}
+
+enum ProjectStatus {
+  ACTIVE
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+  BLOCKED
+}
+
+enum Priority {
+  P1
+  P2
+  P3
+}
+
+enum Energy {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum Context {
+  HOME
+  COMPUTER
+  CALLS
+  ERRANDS
+}
+
+enum ArchiveType {
+  PROJECT
+  AREA
+  RESOURCE
+  TASK
 }

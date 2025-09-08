@@ -12,33 +12,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Calendar, AlertCircle, Flag, Plus, FileText, Check, List, Zap, MapPin } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
+import { projectsApi, tasksApi } from "@/lib/api";
+import { ProjectWithTasks, TaskWithRelations, Priority, Energy, Context } from "@/lib/types";
 
 export default function ProjectPage() {
   const router = useRouter();
   const params = useParams();
   const { projectId } = params;
 
-  const [tasks, setTasks] = useState([
-    { id: 1, name: "Overdue Task", dueDate: "2025-09-05", completed: false, priority: "P2" as string | null, energy: "High" as string | null, context: "@computer" as string | null, notes: "This task is overdue and needs immediate attention. The client has been asking for updates." },
-    { id: 2, name: "Due Today", dueDate: "2025-09-08", completed: false, priority: "P1" as string | null, energy: "Medium" as string | null, context: "@calls" as string | null, notes: "" },
-    { id: 3, name: "No Due Date", dueDate: "", completed: false, priority: null, energy: "Low" as string | null, context: "@home" as string | null, notes: "Research task for future planning. No urgency but good to explore when time allows." },
-    { id: 4, name: "Due Tomorrow", dueDate: "2025-09-09", completed: false, priority: "P1" as string | null, energy: "High" as string | null, context: "@errands" as string | null, notes: "" },
-    { id: 5, name: "Due Soon", dueDate: "2025-09-11", completed: false, priority: "P2" as string | null, energy: "Medium" as string | null, context: "@computer" as string | null, notes: "" },
-    { id: 6, name: "Future Task", dueDate: "2025-09-20", completed: false, priority: "P3" as string | null, energy: "Low" as string | null, context: "@home" as string | null, notes: "" },
-    { id: 7, name: "Very Overdue", dueDate: "2025-08-25", completed: true, priority: "P1" as string | null, energy: "High" as string | null, context: "@calls" as string | null, notes: "Completed successfully despite the delays. Lessons learned for future similar tasks." },
-  ]);
+  const [project, setProject] = useState<ProjectWithTasks | null>(null);
+  const [tasks, setTasks] = useState<TaskWithRelations[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskDueDate, setNewTaskDueDate] = useState("");
-  const [newTaskPriority, setNewTaskPriority] = useState<string | null>(null);
-  const [newTaskEnergy, setNewTaskEnergy] = useState<string | null>(null);
-  const [newTaskContext, setNewTaskContext] = useState<string | null>(null);
+  const [newTaskPriority, setNewTaskPriority] = useState<Priority | null>(null);
+  const [newTaskEnergy, setNewTaskEnergy] = useState<Energy | null>(null);
+  const [newTaskContext, setNewTaskContext] = useState<Context | null>(null);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState<number | null>(null);
   const [editingField, setEditingField] = useState<string | null>(null);
   const addTaskRowRef = useRef<HTMLTableRowElement>(null);
 
-  const sortTasks = (tasksToSort: typeof tasks) => {
-    const priorityOrder: Record<string, number> = { P1: 1, P2: 2, P3: 3 };
+  const sortTasks = (tasksToSort: TaskWithRelations[]) => {
+    const priorityOrder: Record<Priority, number> = { P1: 1, P2: 2, P3: 3 };
     return [...tasksToSort].sort((a, b) => {
       const aPriority = a.priority ? priorityOrder[a.priority] || 5 : 5;
       const bPriority = b.priority ? priorityOrder[b.priority] || 5 : 5;
@@ -58,10 +55,27 @@ export default function ProjectPage() {
     });
   };
 
-  // Sort tasks by priority and due date on mount
+  // Load project and tasks on mount
   useEffect(() => {
-    setTasks(currentTasks => sortTasks(currentTasks));
-  }, []);
+    const loadProjectData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const projectData = await projectsApi.getById(parseInt(projectId as string));
+        setProject(projectData);
+        setTasks(sortTasks(projectData.tasks));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load project');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (projectId) {
+      loadProjectData();
+    }
+  }, [projectId]);
 
   // Handle click outside to dismiss add task form
   useEffect(() => {
@@ -80,28 +94,30 @@ export default function ProjectPage() {
     };
   }, [isAddingTask]);
 
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
     if (newTaskName) {
-      const newTask = {
-        id: tasks.length + 1,
-        name: newTaskName,
-        dueDate: newTaskDueDate || "",
-        priority: newTaskPriority === "none" ? null : newTaskPriority,
-        energy: newTaskEnergy === "none" ? null : newTaskEnergy,
-        context: newTaskContext === "none" ? null : newTaskContext,
-        notes: "",
-        completed: false,
-      };
-      
-      const updatedTasks = [...tasks, newTask];
-      setTasks(sortTasks(updatedTasks));
-      
-      setNewTaskName("");
-      setNewTaskDueDate("");
-      setNewTaskPriority(null);
-      setNewTaskEnergy(null);
-      setNewTaskContext(null);
-      setIsAddingTask(false);
+      try {
+        const newTask = await tasksApi.create({
+          name: newTaskName,
+          dueDate: newTaskDueDate || null,
+          priority: newTaskPriority === "none" ? null : newTaskPriority,
+          energy: newTaskEnergy === "none" ? null : newTaskEnergy,
+          context: newTaskContext === "none" ? null : newTaskContext,
+          projectId: parseInt(projectId as string),
+        });
+        
+        const updatedTasks = [...tasks, newTask];
+        setTasks(sortTasks(updatedTasks));
+        
+        setNewTaskName("");
+        setNewTaskDueDate("");
+        setNewTaskPriority(null);
+        setNewTaskEnergy(null);
+        setNewTaskContext(null);
+        setIsAddingTask(false);
+      } catch (err) {
+        console.error('Failed to create task:', err);
+      }
     }
   };
 
@@ -114,13 +130,13 @@ export default function ProjectPage() {
     setIsAddingTask(false);
   };
 
-  const getPriorityColor = (priority: string | null) => {
+  const getPriorityColor = (priority: Priority | null) => {
     switch (priority) {
-      case "P1":
+      case Priority.P1:
         return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800";
-      case "P2":
+      case Priority.P2:
         return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800";
-      case "P3":
+      case Priority.P3:
         return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800";
       case null:
         return "bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-800/30 dark:text-gray-400 dark:border-gray-700";
@@ -129,13 +145,13 @@ export default function ProjectPage() {
     }
   };
 
-  const getEnergyColor = (energy: string | null) => {
+  const getEnergyColor = (energy: Energy | null) => {
     switch (energy) {
-      case "High":
+      case Energy.HIGH:
         return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800";
-      case "Medium":
+      case Energy.MEDIUM:
         return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800";
-      case "Low":
+      case Energy.LOW:
         return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800";
       case null:
         return "bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-800/30 dark:text-gray-400 dark:border-gray-700";
@@ -144,15 +160,15 @@ export default function ProjectPage() {
     }
   };
 
-  const getContextColor = (context: string | null) => {
+  const getContextColor = (context: Context | null) => {
     switch (context) {
-      case "@home":
+      case Context.HOME:
         return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800";
-      case "@computer":
+      case Context.COMPUTER:
         return "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800";
-      case "@calls":
+      case Context.CALLS:
         return "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800";
-      case "@errands":
+      case Context.ERRANDS:
         return "bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800";
       case null:
         return "bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-800/30 dark:text-gray-400 dark:border-gray-700";
@@ -169,27 +185,43 @@ export default function ProjectPage() {
     }
   };
 
-  const handleToggleTask = (taskId: number) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
-    );
+  const handleToggleTask = async (taskId: number) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    try {
+      const updatedTask = await tasksApi.toggleComplete(taskId, !task.completed);
+      setTasks(tasks.map((t) => t.id === taskId ? updatedTask : t));
+    } catch (err) {
+      console.error('Failed to toggle task:', err);
+    }
   };
 
-  const handleEditTask = (taskId: number, field: string, value: string) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { 
-        ...task, 
-        [field]: field === 'priority' && value === 'none' ? null : value 
-      } : task
-    );
-    
-    // Resort if priority or due date changed
-    if (field === 'priority' || field === 'dueDate') {
-      setTasks(sortTasks(updatedTasks));
-    } else {
-      setTasks(updatedTasks);
+  const handleEditTask = async (taskId: number, field: string, value: string) => {
+    try {
+      let updateData: any = {};
+      
+      if (field === 'priority') {
+        updateData.priority = value === 'none' ? null : value as Priority;
+      } else if (field === 'energy') {
+        updateData.energy = value === 'none' ? null : value as Energy;
+      } else if (field === 'context') {
+        updateData.context = value === 'none' ? null : value as Context;
+      } else {
+        updateData[field] = value;
+      }
+
+      const updatedTask = await tasksApi.update(taskId, updateData);
+      const updatedTasks = tasks.map((task) => task.id === taskId ? updatedTask : task);
+      
+      // Resort if priority or due date changed
+      if (field === 'priority' || field === 'dueDate') {
+        setTasks(sortTasks(updatedTasks));
+      } else {
+        setTasks(updatedTasks);
+      }
+    } catch (err) {
+      console.error('Failed to update task:', err);
     }
   };
 
@@ -250,16 +282,44 @@ export default function ProjectPage() {
     return '';
   };
 
-  // In a real application, you would fetch the project data based on the projectId.
-  const project = {
-    id: projectId,
-    name: `Project ${projectId}`,
-    dueDate: "2025-09-15",
-    status: "In Progress",
-    priority: "High",
-    description:
-      "This is a detailed description of the project. It includes the project goals, scope, and other relevant information.",
-  };
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center mb-6">
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft />
+          </Button>
+          <h1 className="text-3xl font-bold ml-4">Loading...</h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center mb-6">
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft />
+          </Button>
+          <h1 className="text-3xl font-bold ml-4 text-red-600">Error: {error}</h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center mb-6">
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft />
+          </Button>
+          <h1 className="text-3xl font-bold ml-4">Project not found</h1>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -276,15 +336,17 @@ export default function ProjectPage() {
             <div className="flex items-center gap-6 mb-2 mt-1">
               <div className="flex items-center gap-2 py-1">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{project.dueDate}</span>
+                <span className="text-sm font-medium">
+                  {project.dueDate ? new Date(project.dueDate).toLocaleDateString() : 'No due date'}
+                </span>
               </div>
               <div className="flex items-center gap-2 py-1">
                 <AlertCircle className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{project.status}</span>
+                <span className="text-sm font-medium">{project.status.replace('_', ' ')}</span>
               </div>
               <div className="flex items-center gap-2 py-1">
                 <Flag className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{project.priority}</span>
+                <span className="text-sm font-medium">{project.priority || 'No priority'}</span>
               </div>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -387,7 +449,7 @@ export default function ProjectPage() {
                     {editingTask === task.id && editingField === "dueDate" ? (
                       <Input
                         type="date"
-                        defaultValue={task.dueDate}
+                        defaultValue={task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : ''}
                         onBlur={(e) => {
                           handleEditTask(task.id, "dueDate", e.target.value);
                           stopEditing();
@@ -406,10 +468,10 @@ export default function ProjectPage() {
                     ) : (
                       <span className="cursor-pointer hover:bg-muted/20 px-2 py-1 rounded -mx-2 -my-1">
                         {task.dueDate ? (
-                          <span className={getDueDateClass(task.dueDate)}>
-                            <span>{task.dueDate}</span>
+                          <span className={getDueDateClass(new Date(task.dueDate).toISOString().split('T')[0])}>
+                            <span>{new Date(task.dueDate).toLocaleDateString()}</span>
                             <span className="text-xs ml-1 opacity-75">
-                              {formatDaysLeft(getDaysLeft(task.dueDate))}
+                              {formatDaysLeft(getDaysLeft(new Date(task.dueDate).toISOString().split('T')[0]))}
                             </span>
                           </span>
                         ) : (
@@ -471,9 +533,9 @@ export default function ProjectPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">—</SelectItem>
-                          <SelectItem value="High">High</SelectItem>
-                          <SelectItem value="Medium">Medium</SelectItem>
-                          <SelectItem value="Low">Low</SelectItem>
+                          <SelectItem value="HIGH">High</SelectItem>
+                          <SelectItem value="MEDIUM">Medium</SelectItem>
+                          <SelectItem value="LOW">Low</SelectItem>
                         </SelectContent>
                       </Select>
                     ) : task.energy ? (
@@ -482,7 +544,9 @@ export default function ProjectPage() {
                           task.energy
                         )}`}
                       >
-                        {task.energy}
+                        {task.energy === 'HIGH' ? 'High' : 
+                         task.energy === 'MEDIUM' ? 'Medium' :
+                         task.energy === 'LOW' ? 'Low' : task.energy}
                       </span>
                     ) : (
                       <span className="cursor-pointer hover:bg-muted/20 px-2 py-1 rounded text-muted-foreground/50 text-xs">
@@ -507,10 +571,10 @@ export default function ProjectPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">—</SelectItem>
-                          <SelectItem value="@home">@home</SelectItem>
-                          <SelectItem value="@computer">@computer</SelectItem>
-                          <SelectItem value="@calls">@calls</SelectItem>
-                          <SelectItem value="@errands">@errands</SelectItem>
+                          <SelectItem value="HOME">@home</SelectItem>
+                          <SelectItem value="COMPUTER">@computer</SelectItem>
+                          <SelectItem value="CALLS">@calls</SelectItem>
+                          <SelectItem value="ERRANDS">@errands</SelectItem>
                         </SelectContent>
                       </Select>
                     ) : task.context ? (
@@ -519,7 +583,10 @@ export default function ProjectPage() {
                           task.context
                         )}`}
                       >
-                        {task.context}
+                        {task.context === 'HOME' ? '@home' : 
+                         task.context === 'COMPUTER' ? '@computer' :
+                         task.context === 'CALLS' ? '@calls' :
+                         task.context === 'ERRANDS' ? '@errands' : task.context}
                       </span>
                     ) : (
                       <span className="cursor-pointer hover:bg-muted/20 px-2 py-1 rounded text-muted-foreground/50 text-xs">
@@ -562,7 +629,7 @@ export default function ProjectPage() {
                   <td className="p-1 h-14 align-middle leading-none text-center">
                     <Select
                       value={newTaskPriority || "none"}
-                      onValueChange={(value) => setNewTaskPriority(value === "none" ? null : value)}
+                      onValueChange={(value) => setNewTaskPriority(value === "none" ? null : value as Priority)}
                     >
                       <SelectTrigger className="w-16 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0 text-center mx-auto">
                         <SelectValue />
@@ -578,7 +645,7 @@ export default function ProjectPage() {
                   <td className="p-1 h-14 align-middle leading-none text-center">
                     <Select
                       value={newTaskEnergy || "none"}
-                      onValueChange={(value) => setNewTaskEnergy(value === "none" ? null : value)}
+                      onValueChange={(value) => setNewTaskEnergy(value === "none" ? null : value as Energy)}
                     >
                       <SelectTrigger className="w-20 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0 text-center mx-auto">
                         <SelectValue />
@@ -594,7 +661,7 @@ export default function ProjectPage() {
                   <td className="p-1 h-14 align-middle leading-none text-center">
                     <Select
                       value={newTaskContext || "none"}
-                      onValueChange={(value) => setNewTaskContext(value === "none" ? null : value)}
+                      onValueChange={(value) => setNewTaskContext(value === "none" ? null : value as Context)}
                     >
                       <SelectTrigger className="w-24 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0 text-center mx-auto">
                         <SelectValue />
