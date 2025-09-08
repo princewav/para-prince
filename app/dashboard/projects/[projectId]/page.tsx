@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Calendar, AlertCircle, Flag, Plus } from "lucide-react";
+import { ArrowLeft, Calendar, AlertCircle, Flag, Plus, FileText, Check, List, Zap, MapPin } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -19,17 +19,19 @@ export default function ProjectPage() {
   const { projectId } = params;
 
   const [tasks, setTasks] = useState([
-    { id: 1, name: "Overdue Task", dueDate: "2025-09-05", completed: false, priority: "P2" as string | null },
-    { id: 2, name: "Due Today", dueDate: "2025-09-08", completed: false, priority: "P1" as string | null },
-    { id: 3, name: "No Due Date", dueDate: "", completed: false, priority: null },
-    { id: 4, name: "Due Tomorrow", dueDate: "2025-09-09", completed: false, priority: "P1" as string | null },
-    { id: 5, name: "Due Soon", dueDate: "2025-09-11", completed: false, priority: "P2" as string | null },
-    { id: 6, name: "Future Task", dueDate: "2025-09-20", completed: false, priority: "P3" as string | null },
-    { id: 7, name: "Very Overdue", dueDate: "2025-08-25", completed: true, priority: "P1" as string | null },
+    { id: 1, name: "Overdue Task", dueDate: "2025-09-05", completed: false, priority: "P2" as string | null, energy: "High" as string | null, context: "@computer" as string | null, notes: "" },
+    { id: 2, name: "Due Today", dueDate: "2025-09-08", completed: false, priority: "P1" as string | null, energy: "Medium" as string | null, context: "@calls" as string | null, notes: "" },
+    { id: 3, name: "No Due Date", dueDate: "", completed: false, priority: null, energy: "Low" as string | null, context: "@home" as string | null, notes: "" },
+    { id: 4, name: "Due Tomorrow", dueDate: "2025-09-09", completed: false, priority: "P1" as string | null, energy: "High" as string | null, context: "@errands" as string | null, notes: "" },
+    { id: 5, name: "Due Soon", dueDate: "2025-09-11", completed: false, priority: "P2" as string | null, energy: "Medium" as string | null, context: "@computer" as string | null, notes: "" },
+    { id: 6, name: "Future Task", dueDate: "2025-09-20", completed: false, priority: "P3" as string | null, energy: "Low" as string | null, context: "@home" as string | null, notes: "" },
+    { id: 7, name: "Very Overdue", dueDate: "2025-08-25", completed: true, priority: "P1" as string | null, energy: "High" as string | null, context: "@calls" as string | null, notes: "" },
   ]);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskDueDate, setNewTaskDueDate] = useState("");
   const [newTaskPriority, setNewTaskPriority] = useState<string | null>("P3");
+  const [newTaskEnergy, setNewTaskEnergy] = useState<string | null>("Medium");
+  const [newTaskContext, setNewTaskContext] = useState<string | null>("@computer");
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState<number | null>(null);
   const [editingField, setEditingField] = useState<string | null>(null);
@@ -67,6 +69,9 @@ export default function ProjectPage() {
         name: newTaskName,
         dueDate: newTaskDueDate || "",
         priority: newTaskPriority === "none" ? null : newTaskPriority,
+        energy: newTaskEnergy === "none" ? null : newTaskEnergy,
+        context: newTaskContext === "none" ? null : newTaskContext,
+        notes: "",
         completed: false,
       };
       
@@ -76,6 +81,8 @@ export default function ProjectPage() {
       setNewTaskName("");
       setNewTaskDueDate("");
       setNewTaskPriority("P3");
+      setNewTaskEnergy("Medium");
+      setNewTaskContext("@computer");
       setIsAddingTask(false);
     }
   };
@@ -84,6 +91,8 @@ export default function ProjectPage() {
     setNewTaskName("");
     setNewTaskDueDate("");
     setNewTaskPriority("P3");
+    setNewTaskEnergy("Medium");
+    setNewTaskContext("@computer");
     setIsAddingTask(false);
   };
 
@@ -95,6 +104,38 @@ export default function ProjectPage() {
         return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800";
       case "P3":
         return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800";
+      case null:
+        return "bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-800/30 dark:text-gray-400 dark:border-gray-700";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800";
+    }
+  };
+
+  const getEnergyColor = (energy: string | null) => {
+    switch (energy) {
+      case "High":
+        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800";
+      case "Medium":
+        return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800";
+      case "Low":
+        return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800";
+      case null:
+        return "bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-800/30 dark:text-gray-400 dark:border-gray-700";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800";
+    }
+  };
+
+  const getContextColor = (context: string | null) => {
+    switch (context) {
+      case "@home":
+        return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800";
+      case "@computer":
+        return "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800";
+      case "@calls":
+        return "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800";
+      case "@errands":
+        return "bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800";
       case null:
         return "bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-800/30 dark:text-gray-400 dark:border-gray-700";
       default:
@@ -240,23 +281,51 @@ export default function ProjectPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b">
-                <th className="px-3 py-2 font-medium w-12">Done</th>
-                <th className="px-3 py-2 font-medium">Task Name</th>
-                <th className="px-3 py-2 font-medium">Due Date</th>
-                <th className="px-3 py-2 font-medium w-20">Priority</th>
+                <th className="px-3 py-2 font-medium w-4 text-center" title="Completed">
+                  <Check className="h-4 w-4 mx-auto text-muted-foreground" />
+                </th>
+                <th className="px-3 py-2 font-medium w-4 text-center" title="Notes">
+                  <FileText className="h-4 w-4 mx-auto text-muted-foreground" />
+                </th>
+                <th className="px-3 py-2 font-medium w-48" title="Task Name">
+                  <List className="h-4 w-4 mr-2 text-muted-foreground inline-block" />
+                  <span className="text-sm">Task</span>
+                </th>
+                <th className="px-3 py-2 font-medium w-32" title="Due Date">
+                  <Calendar className="h-4 w-4 mx-auto text-muted-foreground" />
+                </th>
+                <th className="px-3 py-2 font-medium w-8 text-center" title="Priority">
+                  <Flag className="h-4 w-4 mx-auto text-muted-foreground" />
+                </th>
+                <th className="px-3 py-2 font-medium w-12 text-center" title="Energy">
+                  <Zap className="h-4 w-4 mx-auto text-muted-foreground" />
+                </th>
+                <th className="px-3 py-2 font-medium w-20 text-center" title="Context">
+                  <MapPin className="h-4 w-4 mx-auto text-muted-foreground" />
+                </th>
               </tr>
             </thead>
             <tbody>
               {tasks.map((task) => (
                 <tr key={task.id} className="border-b last:border-b-0">
-                  <td className="px-3 py-2 h-10 align-middle leading-none">
+                  <td className="px-3 py-2 h-10 align-middle leading-none text-center">
                     <Checkbox
                       checked={task.completed}
-                      onCheckedChange={(checked) => handleToggleTask(task.id)}
+                      onCheckedChange={() => handleToggleTask(task.id)}
                     />
                   </td>
+                  <td className="px-3 py-2 h-10 align-middle leading-none text-center">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 hover:bg-muted/50"
+                      title="View Notes"
+                    >
+                      <FileText className="h-3 w-3 text-muted-foreground" />
+                    </Button>
+                  </td>
                   <td
-                    className={`px-3 py-2 h-10 align-middle leading-none ${
+                    className={`px-3 py-2 h-10 align-middle leading-none w-48 ${
                       task.completed ? "line-through text-muted-foreground" : ""
                     }`}
                     onClick={() => startEditing(task.id, "name")}
@@ -280,9 +349,11 @@ export default function ProjectPage() {
                         autoFocus
                       />
                     ) : (
-                      <span className="cursor-pointer hover:bg-muted/20 px-2 py-1 rounded -mx-2 -my-1">
-                        {task.name}
-                      </span>
+                      <div className="cursor-pointer hover:bg-muted/20 px-2 py-1 rounded -mx-2 -my-1 w-full overflow-hidden">
+                        <span className="block truncate" title={task.name}>
+                          {task.name}
+                        </span>
+                      </div>
                     )}
                   </td>
                   <td
@@ -326,7 +397,7 @@ export default function ProjectPage() {
                     )}
                   </td>
                   <td
-                    className="px-3 py-2 h-10 align-middle leading-none"
+                    className="px-3 py-2 h-10 align-middle leading-none text-center"
                     onClick={() => startEditing(task.id, "priority")}
                   >
                     {editingTask === task.id && editingField === "priority" ? (
@@ -361,20 +432,98 @@ export default function ProjectPage() {
                       </span>
                     )}
                   </td>
+                  <td
+                    className="px-3 py-2 h-10 align-middle leading-none text-center"
+                    onClick={() => startEditing(task.id, "energy")}
+                  >
+                    {editingTask === task.id && editingField === "energy" ? (
+                      <Select
+                        defaultValue={task.energy || "none"}
+                        onValueChange={(value: string) => {
+                          handleEditTask(task.id, "energy", value);
+                          stopEditing();
+                        }}
+                      >
+                        <SelectTrigger className="w-20 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">—</SelectItem>
+                          <SelectItem value="High">High</SelectItem>
+                          <SelectItem value="Medium">Medium</SelectItem>
+                          <SelectItem value="Low">Low</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : task.energy ? (
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full border cursor-pointer hover:opacity-80 transition-opacity ${getEnergyColor(
+                          task.energy
+                        )}`}
+                      >
+                        {task.energy}
+                      </span>
+                    ) : (
+                      <span className="cursor-pointer hover:bg-muted/20 px-2 py-1 rounded text-muted-foreground/50 text-xs">
+                        —
+                      </span>
+                    )}
+                  </td>
+                  <td
+                    className="px-3 py-2 h-10 align-middle leading-none text-center"
+                    onClick={() => startEditing(task.id, "context")}
+                  >
+                    {editingTask === task.id && editingField === "context" ? (
+                      <Select
+                        defaultValue={task.context || "none"}
+                        onValueChange={(value: string) => {
+                          handleEditTask(task.id, "context", value);
+                          stopEditing();
+                        }}
+                      >
+                        <SelectTrigger className="w-24 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">—</SelectItem>
+                          <SelectItem value="@home">@home</SelectItem>
+                          <SelectItem value="@computer">@computer</SelectItem>
+                          <SelectItem value="@calls">@calls</SelectItem>
+                          <SelectItem value="@errands">@errands</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : task.context ? (
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full border cursor-pointer hover:opacity-80 transition-opacity ${getContextColor(
+                          task.context
+                        )}`}
+                      >
+                        {task.context}
+                      </span>
+                    ) : (
+                      <span className="cursor-pointer hover:bg-muted/20 px-2 py-1 rounded text-muted-foreground/50 text-xs">
+                        —
+                      </span>
+                    )}
+                  </td>
                 </tr>
               ))}
               {isAddingTask && (
                 <tr className="border-b-0 bg-muted/20">
-                  <td className="px-3 py-2 h-10 align-middle leading-none">
-                    <div className="w-4 h-4 rounded-sm border-2 border-dashed border-muted-foreground/40"></div>
+                  <td className="px-3 py-2 h-10 align-middle leading-none text-center">
+                    <div className="w-4 h-4 rounded-sm border-2 border-dashed border-muted-foreground/40 mx-auto"></div>
                   </td>
-                  <td className="px-3 py-2 h-10 align-middle leading-none">
+                  <td className="px-3 py-2 h-10 align-middle leading-none text-center">
+                    <div className="w-6 h-6 rounded border border-dashed border-muted-foreground/40 flex items-center justify-center mx-auto">
+                      <FileText className="h-3 w-3 text-muted-foreground/40" />
+                    </div>
+                  </td>
+                  <td className="px-3 py-2 h-10 align-middle leading-none w-48">
                     <Input
                       placeholder="Enter task name..."
                       value={newTaskName}
                       onChange={(e) => setNewTaskName(e.target.value)}
                       onKeyDown={handleKeyPress}
-                      className="border-none shadow-none focus-visible:ring-0 px-2 py-0 bg-transparent placeholder:text-muted-foreground/60 h-5"
+                      className="border-none shadow-none focus-visible:ring-0 px-2 py-0 bg-transparent placeholder:text-muted-foreground/60 h-5 w-full"
                       autoFocus
                     />
                   </td>
@@ -388,20 +537,53 @@ export default function ProjectPage() {
                       placeholder="Optional"
                     />
                   </td>
+                  <td className="px-3 py-2 h-10 align-middle leading-none text-center">
+                    <Select
+                      value={newTaskPriority}
+                      onValueChange={setNewTaskPriority}
+                    >
+                      <SelectTrigger className="w-16 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">—</SelectItem>
+                        <SelectItem value="P1">P1</SelectItem>
+                        <SelectItem value="P2">P2</SelectItem>
+                        <SelectItem value="P3">P3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </td>
+                  <td className="px-3 py-2 h-10 align-middle leading-none text-center">
+                    <Select
+                      value={newTaskEnergy}
+                      onValueChange={setNewTaskEnergy}
+                    >
+                      <SelectTrigger className="w-20 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">—</SelectItem>
+                        <SelectItem value="High">High</SelectItem>
+                        <SelectItem value="Medium">Medium</SelectItem>
+                        <SelectItem value="Low">Low</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </td>
                   <td className="px-3 py-2 h-10 align-middle leading-none">
-                    <div className="flex gapx-2 py-1 items-center">
+                    <div className="flex gap-2 items-center">
                       <Select
-                        value={newTaskPriority}
-                        onValueChange={setNewTaskPriority}
+                        value={newTaskContext}
+                        onValueChange={setNewTaskContext}
                       >
-                        <SelectTrigger className="w-16 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0">
+                        <SelectTrigger className="w-24 h-5 border-none shadow-none focus:ring-0 bg-transparent text-xs px-2 py-0">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">—</SelectItem>
-                          <SelectItem value="P1">P1</SelectItem>
-                          <SelectItem value="P2">P2</SelectItem>
-                          <SelectItem value="P3">P3</SelectItem>
+                          <SelectItem value="@home">@home</SelectItem>
+                          <SelectItem value="@computer">@computer</SelectItem>
+                          <SelectItem value="@calls">@calls</SelectItem>
+                          <SelectItem value="@errands">@errands</SelectItem>
                         </SelectContent>
                       </Select>
                       <Button
