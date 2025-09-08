@@ -26,8 +26,8 @@ export function ThemeToggle({ isCompact }: { isCompact?: boolean }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="w-full justify-start">
-          <Settings className="mr-2 h-4 w-4" />
+        <Button variant="ghost" className={isCompact ? "w-8 h-8 p-0 justify-center" : "w-full justify-start"}>
+          <Settings className={isCompact ? "h-4 w-4" : "mr-2 h-4 w-4"} />
           {!isCompact && "Settings"}
         </Button>
       </DropdownMenuTrigger>
