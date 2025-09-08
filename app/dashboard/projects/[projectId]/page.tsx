@@ -19,13 +19,13 @@ export default function ProjectPage() {
   const { projectId } = params;
 
   const [tasks, setTasks] = useState([
-    { id: 1, name: "Overdue Task", dueDate: "2025-09-05", completed: false, priority: "P2" as string | null, energy: "High" as string | null, context: "@computer" as string | null, notes: "" },
+    { id: 1, name: "Overdue Task", dueDate: "2025-09-05", completed: false, priority: "P2" as string | null, energy: "High" as string | null, context: "@computer" as string | null, notes: "This task is overdue and needs immediate attention. The client has been asking for updates." },
     { id: 2, name: "Due Today", dueDate: "2025-09-08", completed: false, priority: "P1" as string | null, energy: "Medium" as string | null, context: "@calls" as string | null, notes: "" },
-    { id: 3, name: "No Due Date", dueDate: "", completed: false, priority: null, energy: "Low" as string | null, context: "@home" as string | null, notes: "" },
+    { id: 3, name: "No Due Date", dueDate: "", completed: false, priority: null, energy: "Low" as string | null, context: "@home" as string | null, notes: "Research task for future planning. No urgency but good to explore when time allows." },
     { id: 4, name: "Due Tomorrow", dueDate: "2025-09-09", completed: false, priority: "P1" as string | null, energy: "High" as string | null, context: "@errands" as string | null, notes: "" },
     { id: 5, name: "Due Soon", dueDate: "2025-09-11", completed: false, priority: "P2" as string | null, energy: "Medium" as string | null, context: "@computer" as string | null, notes: "" },
     { id: 6, name: "Future Task", dueDate: "2025-09-20", completed: false, priority: "P3" as string | null, energy: "Low" as string | null, context: "@home" as string | null, notes: "" },
-    { id: 7, name: "Very Overdue", dueDate: "2025-08-25", completed: true, priority: "P1" as string | null, energy: "High" as string | null, context: "@calls" as string | null, notes: "" },
+    { id: 7, name: "Very Overdue", dueDate: "2025-08-25", completed: true, priority: "P1" as string | null, energy: "High" as string | null, context: "@calls" as string | null, notes: "Completed successfully despite the delays. Lessons learned for future similar tasks." },
   ]);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskDueDate, setNewTaskDueDate] = useState("");
@@ -256,15 +256,15 @@ export default function ProjectPage() {
         <CardVariant padding="sm" className="p-4">
           <CardContentVariant padding="sm" className="">
             <div className="flex items-center gap-6 mb-2 mt-1">
-              <div className="flex items-center gapx-2 py-1">
+              <div className="flex items-center gap-2 py-1">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">{project.dueDate}</span>
               </div>
-              <div className="flex items-center gapx-2 py-1">
+              <div className="flex items-center gap-2 py-1">
                 <AlertCircle className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">{project.status}</span>
               </div>
-              <div className="flex items-center gapx-2 py-1">
+              <div className="flex items-center gap-2 py-1">
                 <Flag className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">{project.priority}</span>
               </div>
@@ -320,8 +320,12 @@ export default function ProjectPage() {
                       size="icon"
                       className="h-6 w-6 hover:bg-muted/50"
                       title="View Notes"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/dashboard/projects/${projectId}/tasks/${task.id}/notes`);
+                      }}
                     >
-                      <FileText className="h-3 w-3 text-muted-foreground" />
+                      <FileText className={`h-3 w-3 ${task.notes && task.notes.trim() ? 'text-foreground' : 'text-muted-foreground/50'}`} />
                     </Button>
                   </td>
                   <td
