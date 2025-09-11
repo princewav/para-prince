@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { ArchiveType } from '@prisma/client'
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,7 +8,7 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type')
 
     const where = {
-      ...(type && { type: type.toUpperCase() })
+      ...(type && { type: type.toUpperCase() as ArchiveType })
     }
 
     const archives = await prisma.archive.findMany({

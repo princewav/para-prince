@@ -26,9 +26,9 @@ export default function ProjectPage() {
   const [error, setError] = useState<string | null>(null);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskDueDate, setNewTaskDueDate] = useState("");
-  const [newTaskPriority, setNewTaskPriority] = useState<Priority | null>(null);
-  const [newTaskEnergy, setNewTaskEnergy] = useState<Energy | null>(null);
-  const [newTaskContext, setNewTaskContext] = useState<Context | null>(null);
+  const [newTaskPriority, setNewTaskPriority] = useState<Priority | "none" | null>(null);
+  const [newTaskEnergy, setNewTaskEnergy] = useState<Energy | "none" | null>(null);
+  const [newTaskContext, setNewTaskContext] = useState<Context | "none" | null>(null);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState<number | null>(null);
   const [editingField, setEditingField] = useState<string | null>(null);
