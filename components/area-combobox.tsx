@@ -22,7 +22,7 @@ import {
 interface Area {
   id: number;
   name: string;
-  description?: string;
+  description?: string | null;
 }
 
 interface AreaComboboxProps {

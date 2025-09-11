@@ -2,6 +2,7 @@ import { Project, Task, Area, Resource, Archive, Priority, Energy, Context, Proj
 
 export type ProjectWithTasks = Project & {
   tasks: Task[]
+  area?: Area | null
   _count: {
     tasks: number
   }
@@ -86,6 +87,7 @@ export interface CreateProjectData {
   status?: ProjectStatus
   priority?: Priority | null
   dueDate?: string | null
+  areaId?: number | null
 }
 
 export interface UpdateProjectData extends Partial<CreateProjectData> {}
