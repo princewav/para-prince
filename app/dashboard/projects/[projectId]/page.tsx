@@ -16,6 +16,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { projectsApi, tasksApi, areasApi } from "@/lib/api";
 import { ProjectWithTasks, TaskWithRelations, Priority, Energy, Context, ProjectStatus, AreaWithTasks } from "@/lib/types";
+import { getPriorityColor, getEnergyColor, getContextColor, getProjectStatusColor } from "@/lib/badge-utils";
 
 export default function ProjectPage() {
   const router = useRouter();
@@ -139,52 +140,6 @@ export default function ProjectPage() {
     setIsAddingTask(false);
   };
 
-  const getPriorityColor = (priority: Priority | null) => {
-    switch (priority) {
-      case Priority.P1:
-        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800";
-      case Priority.P2:
-        return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800";
-      case Priority.P3:
-        return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800";
-      case null:
-        return "bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-800/30 dark:text-gray-400 dark:border-gray-700";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800";
-    }
-  };
-
-  const getEnergyColor = (energy: Energy | null) => {
-    switch (energy) {
-      case Energy.HIGH:
-        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800";
-      case Energy.MEDIUM:
-        return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800";
-      case Energy.LOW:
-        return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800";
-      case null:
-        return "bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-800/30 dark:text-gray-400 dark:border-gray-700";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800";
-    }
-  };
-
-  const getContextColor = (context: Context | null) => {
-    switch (context) {
-      case Context.HOME:
-        return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800";
-      case Context.COMPUTER:
-        return "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800";
-      case Context.CALLS:
-        return "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800";
-      case Context.ERRANDS:
-        return "bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800";
-      case null:
-        return "bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-800/30 dark:text-gray-400 dark:border-gray-700";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800";
-    }
-  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && newTaskName) {
@@ -306,20 +261,6 @@ export default function ProjectPage() {
     }
   };
 
-  const getProjectStatusColor = (status: ProjectStatus) => {
-    switch (status) {
-      case ProjectStatus.ACTIVE:
-        return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800";
-      case ProjectStatus.IN_PROGRESS:
-        return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800";
-      case ProjectStatus.COMPLETED:
-        return "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800";
-      case ProjectStatus.ON_HOLD:
-        return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800";
-    }
-  };
 
   const getDaysLeft = (dueDate: string) => {
     if (!dueDate) return null;

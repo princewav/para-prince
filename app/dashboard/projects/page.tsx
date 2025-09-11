@@ -7,11 +7,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pencil, Trash2, Calendar, Flag, MapPin, AlertCircle, Clock, CheckCircle, Pause, Target } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Calendar, Flag, MapPin, AlertCircle, Target } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AddProjectDialog } from "@/components/add-project-dialog";
 import { Priority, ProjectStatus } from "@/lib/types";
+import { getStatusBadge, getPriorityBadge } from "@/lib/badge-utils";
 
 interface Project {
   id: number;
@@ -58,75 +59,6 @@ export default function ProjectsPage() {
     router.push(`/dashboard/projects/${projectId}`);
   };
 
-  const getStatusBadge = (status: ProjectStatus) => {
-    const statusConfig = {
-      ACTIVE: {
-        label: 'Active',
-        icon: Target,
-        className: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800'
-      },
-      IN_PROGRESS: {
-        label: 'In Progress',
-        icon: Clock,
-        className: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800'
-      },
-      COMPLETED: {
-        label: 'Completed',
-        icon: CheckCircle,
-        className: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800'
-      },
-      ON_HOLD: {
-        label: 'On Hold',
-        icon: Pause,
-        className: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800'
-      }
-    };
-
-    const config = statusConfig[status];
-    const IconComponent = config.icon;
-
-    return (
-      <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full border ${config.className}`}>
-        <IconComponent className="h-3 w-3" />
-        {config.label}
-      </span>
-    );
-  };
-
-  const getPriorityBadge = (priority: Priority | undefined) => {
-    if (!priority) {
-      return (
-        <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full border bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-800/30 dark:text-gray-400 dark:border-gray-700">
-          <Flag className="h-3 w-3" />
-          None
-        </span>
-      );
-    }
-
-    const priorityConfig = {
-      P1: {
-        label: 'P1',
-        className: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800'
-      },
-      P2: {
-        label: 'P2',
-        className: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800'
-      },
-      P3: {
-        label: 'P3',
-        className: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800'
-      }
-    };
-
-    const config = priorityConfig[priority];
-
-    return (
-      <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full border ${config.className}`}>
-        <Flag className="h-3 w-3" />
-        {config.label}
-      </span>
-    );
-  };
 
   const getDaysLeft = (dueDate: string | undefined) => {
     if (!dueDate) return null;

@@ -5,6 +5,7 @@ export async function GET() {
   try {
     const areas = await prisma.area.findMany({
       include: {
+        projects: true,
         tasks: {
           orderBy: [
             { priority: 'asc' },
@@ -14,9 +15,11 @@ export async function GET() {
         resources: true,
         _count: {
           select: {
+            projects: true,
             tasks: {
               where: { completed: false }
-            }
+            },
+            resources: true
           }
         }
       },
