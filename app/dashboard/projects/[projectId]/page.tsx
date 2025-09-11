@@ -524,14 +524,14 @@ export default function ProjectPage() {
               {/* Area */}
               <div className="flex items-center gap-2 py-1">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
-                {editingProject && editingProjectField === 'areaId' ? (
+                {editingProjectField === 'areaId' ? (
                   <div className="w-40" onClick={(e) => e.stopPropagation()}>
                     <AreaCombobox
                       areas={areas as any}
                       value={((project as any).areaId)?.toString() || ''}
                       onValueChange={(value) => {
                         handleEditProject('areaId', value);
-                        stopEditingProject();
+                        setEditingProjectField(null);
                       }}
                       onCreateArea={handleCreateArea as any}
                       placeholder="Select area..."
@@ -542,7 +542,7 @@ export default function ProjectPage() {
                     className="text-sm font-medium cursor-pointer hover:bg-muted/20 px-1 py-0.5 rounded"
                     onClick={(e) => {
                       e.stopPropagation();
-                      startEditingProject('areaId');
+                      setEditingProjectField('areaId');
                     }}
                   >
                     {areas.find(a => a.id === (project as any).areaId)?.name || 'No area'}

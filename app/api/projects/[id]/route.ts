@@ -20,6 +20,7 @@ export async function GET(request: NextRequest, { params }: Props) {
     const project = await prisma.project.findUnique({
       where: { id: projectId },
       include: {
+        area: true,
         tasks: {
           orderBy: [
             { priority: 'asc' },
@@ -67,7 +68,7 @@ export async function PUT(request: NextRequest, { params }: Props) {
     }
 
     const body = await request.json()
-    const { name, description, status, priority, dueDate } = body
+    const { name, description, status, priority, dueDate, areaId } = body
 
     const project = await prisma.project.update({
       where: { id: projectId },
@@ -77,8 +78,10 @@ export async function PUT(request: NextRequest, { params }: Props) {
         status,
         priority,
         dueDate: dueDate ? new Date(dueDate) : null,
+        areaId: areaId || null,
       },
       include: {
+        area: true,
         tasks: {
           orderBy: [
             { priority: 'asc' },
