@@ -10,6 +10,7 @@ import {
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AddProjectDialog } from "@/components/add-project-dialog";
 
 interface Project {
   id: number;
@@ -20,6 +21,10 @@ interface Project {
   dueDate?: string;
   createdAt: string;
   updatedAt: string;
+  area?: {
+    id: number;
+    name: string;
+  };
 }
 
 export default function ProjectsPage() {
@@ -27,20 +32,21 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchProjects() {
-      try {
-        const response = await fetch('/api/projects');
-        if (!response.ok) throw new Error('Failed to fetch projects');
-        const data = await response.json();
-        setProjects(data);
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-      } finally {
-        setLoading(false);
-      }
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/projects');
+      if (!response.ok) throw new Error('Failed to fetch projects');
+      const data = await response.json();
+      setProjects(data);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchProjects();
   }, []);
 
@@ -53,7 +59,7 @@ export default function ProjectsPage() {
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Projects Dashboard</h1>
-          <Button>Add New Project</Button>
+          <AddProjectDialog onProjectAdded={fetchProjects} />
         </div>
         <div className="text-center py-8">Loading projects...</div>
       </div>
@@ -64,7 +70,7 @@ export default function ProjectsPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Projects Dashboard</h1>
-        <Button>Add New Project</Button>
+        <AddProjectDialog onProjectAdded={fetchProjects} />
       </div>
 
       <div className="rounded-md border">
@@ -72,6 +78,7 @@ export default function ProjectsPage() {
           <thead>
             <tr className="border-b">
               <th className="p-4 font-medium">Project Name</th>
+              <th className="p-4 font-medium">Area</th>
               <th className="p-4 font-medium">Due Date</th>
               <th className="p-4 font-medium">Status</th>
               <th className="p-4 font-medium">Priority</th>
@@ -81,7 +88,7 @@ export default function ProjectsPage() {
           <tbody>
             {projects.length === 0 ? (
               <tr>
-                <td colSpan={5} className="p-4 text-center text-muted-foreground">
+                <td colSpan={6} className="p-4 text-center text-muted-foreground">
                   No projects found
                 </td>
               </tr>
@@ -93,6 +100,7 @@ export default function ProjectsPage() {
                   onClick={() => handleRowClick(project.id)}
                 >
                   <td className="p-4">{project.name}</td>
+                  <td className="p-4">{project.area?.name || '-'}</td>
                   <td className="p-4">{project.dueDate ? new Date(project.dueDate).toLocaleDateString() : '-'}</td>
                   <td className="p-4">{project.status.replace('_', ' ')}</td>
                   <td className="p-4">{project.priority || '-'}</td>

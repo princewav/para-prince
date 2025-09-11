@@ -5,6 +5,12 @@ export async function GET() {
   try {
     const projects = await prisma.project.findMany({
       include: {
+        area: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
         tasks: {
           orderBy: [
             { priority: 'asc' },
@@ -37,7 +43,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, description, status, priority, dueDate } = body
+    const { name, description, status, priority, dueDate, areaId } = body
 
     const project = await prisma.project.create({
       data: {
@@ -46,8 +52,15 @@ export async function POST(request: NextRequest) {
         status,
         priority,
         dueDate: dueDate ? new Date(dueDate) : null,
+        areaId,
       },
       include: {
+        area: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
         tasks: true,
         _count: {
           select: {

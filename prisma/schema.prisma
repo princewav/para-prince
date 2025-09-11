@@ -18,6 +18,8 @@ model Project {
   updatedAt   DateTime    @updatedAt
   resources   Resource[]
   tasks       Task[]
+  area        Area?       @relation(fields: [areaId], references: [id])
+  areaId      Int?
 }
 
 model Area {
@@ -29,6 +31,7 @@ model Area {
   updatedAt   DateTime  @updatedAt
   resources   Resource[]
   tasks       Task[]
+  projects    Project[]
 }
 
 model Resource {
