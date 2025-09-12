@@ -425,7 +425,7 @@ export default function ProjectPage() {
                   </Select>
                 ) : (
                   <span className={`px-2 py-1 text-xs font-medium rounded-full border cursor-pointer hover:opacity-80 transition-opacity ${getProjectStatusColor(project.status)}`}>
-                    {project.status.replace('_', ' ')}
+                    {project.status.replace('_', ' ').toLocaleLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
                   </span>
                 )}
               </div>
