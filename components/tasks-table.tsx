@@ -47,6 +47,11 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
   const sortTasks = (tasksToSort: TaskWithRelations[]) => {
     const priorityOrder: Record<Priority, number> = { P1: 1, P2: 2, P3: 3 };
     return [...tasksToSort].sort((a, b) => {
+      // Always sort completed tasks to the bottom
+      if (a.completed && !b.completed) return 1;
+      if (!a.completed && b.completed) return -1;
+      
+      // For non-completed tasks or both completed, sort by priority first
       const aPriority = a.priority ? priorityOrder[a.priority] || 5 : 5;
       const bPriority = b.priority ? priorityOrder[b.priority] || 5 : 5;
       
@@ -54,6 +59,7 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
         return aPriority - bPriority;
       }
       
+      // Then sort by due date
       if (!a.dueDate && !b.dueDate) return 0;
       if (!a.dueDate) return 1;
       if (!b.dueDate) return -1;
