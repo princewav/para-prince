@@ -123,7 +123,10 @@ export async function DELETE(request: NextRequest, { params }: Props) {
       )
     }
 
-    // Archive the project instead of deleting
+    // Check if this is a force delete (hard delete)
+    const { searchParams } = new URL(request.url)
+    const forceDelete = searchParams.get('force') === 'true'
+
     const project = await prisma.project.findUnique({
       where: { id: projectId },
       include: { tasks: true, resources: true }
@@ -136,27 +139,35 @@ export async function DELETE(request: NextRequest, { params }: Props) {
       )
     }
 
-    // Create archive entry
-    await prisma.archive.create({
-      data: {
-        name: project.name,
-        description: project.description,
-        type: 'PROJECT',
-        originalId: project.id,
-        archivedData: project
-      }
-    })
+    if (forceDelete) {
+      // Hard delete - permanently remove without archiving
+      await prisma.project.delete({
+        where: { id: projectId }
+      })
+      return NextResponse.json({ message: 'Project deleted permanently' })
+    } else {
+      // Archive the project instead of deleting
+      await prisma.archive.create({
+        data: {
+          name: project.name,
+          description: project.description,
+          type: 'PROJECT',
+          originalId: project.id,
+          archivedData: project
+        }
+      })
 
-    // Delete the project (cascading will handle tasks)
-    await prisma.project.delete({
-      where: { id: projectId }
-    })
+      // Delete the project (cascading will handle tasks)
+      await prisma.project.delete({
+        where: { id: projectId }
+      })
 
-    return NextResponse.json({ message: 'Project archived successfully' })
+      return NextResponse.json({ message: 'Project archived successfully' })
+    }
   } catch (error) {
-    console.error('Error archiving project:', error)
+    console.error('Error processing project deletion:', error)
     return NextResponse.json(
-      { error: 'Failed to archive project' },
+      { error: 'Failed to process project deletion' },
       { status: 500 }
     )
   }

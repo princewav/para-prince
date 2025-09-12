@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pencil, Trash2, Calendar, Flag, MapPin, AlertCircle, Target, Copy } from "lucide-react";
+import { MoreHorizontal, Calendar, Flag, MapPin, AlertCircle, Target, Copy, Archive, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AddProjectDialog } from "@/components/add-project-dialog";
@@ -45,6 +45,7 @@ export function ProjectsTable({ areaId, showAreaColumn = false, onProjectAdded }
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [deleteAction, setDeleteAction] = useState<'archive' | 'delete'>('archive');
 
   const fetchProjects = async () => {
     try {
@@ -84,9 +85,29 @@ export function ProjectsTable({ areaId, showAreaColumn = false, onProjectAdded }
     }
   };
 
-  const handleDeleteProject = async (projectId: number) => {
+  const handleArchiveProject = async (projectId: number) => {
     try {
       const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to archive project');
+      }
+      
+      // Remove project from state
+      setProjects(projects.filter(project => project.id !== projectId));
+      setProjectToDelete(null);
+    } catch (err) {
+      console.error('Failed to archive project:', err);
+    }
+  };
+
+  const handleDeleteProject = async (projectId: number) => {
+    try {
+      // For true delete, we'd need a different API endpoint
+      // For now, let's create one that bypasses the archive system
+      const response = await fetch(`/api/projects/${projectId}?force=true`, {
         method: 'DELETE',
       });
       
@@ -102,8 +123,15 @@ export function ProjectsTable({ areaId, showAreaColumn = false, onProjectAdded }
     }
   };
 
+  const openArchiveDialog = (project: Project) => {
+    setProjectToDelete(project);
+    setDeleteAction('archive');
+    setDeleteDialogOpen(true);
+  };
+
   const openDeleteDialog = (project: Project) => {
     setProjectToDelete(project);
+    setDeleteAction('delete');
     setDeleteDialogOpen(true);
   };
 
@@ -299,10 +327,6 @@ export function ProjectsTable({ areaId, showAreaColumn = false, onProjectAdded }
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                          <Pencil className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={(e) => {
                             e.stopPropagation();
@@ -312,6 +336,16 @@ export function ProjectsTable({ areaId, showAreaColumn = false, onProjectAdded }
                         >
                           <Copy className="mr-2 h-4 w-4" />
                           Duplicate Project
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openArchiveDialog(project);
+                          }}
+                          className="text-amber-600 focus:text-amber-600 cursor-pointer"
+                        >
+                          <Archive className="mr-2 h-4 w-4" />
+                          Archive
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={(e) => {
@@ -336,9 +370,21 @@ export function ProjectsTable({ areaId, showAreaColumn = false, onProjectAdded }
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        onConfirm={() => projectToDelete && handleDeleteProject(projectToDelete.id)}
-        title="Delete Project"
-        description="Are you sure you want to delete this project?"
+        onConfirm={() => {
+          if (projectToDelete) {
+            if (deleteAction === 'archive') {
+              handleArchiveProject(projectToDelete.id);
+            } else {
+              handleDeleteProject(projectToDelete.id);
+            }
+          }
+        }}
+        title={deleteAction === 'archive' ? "Archive Project" : "Delete Project"}
+        description={
+          deleteAction === 'archive' 
+            ? "Are you sure you want to archive this project? It can be restored later from the archives."
+            : "Are you sure you want to permanently delete this project? This action cannot be undone."
+        }
         itemName={projectToDelete?.name || ''}
       />
     </div>

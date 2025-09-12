@@ -146,6 +146,10 @@ export async function DELETE(request: NextRequest, { params }: Props) {
       )
     }
 
+    // Check if this is a force delete (hard delete)
+    const { searchParams } = new URL(request.url)
+    const forceDelete = searchParams.get('force') === 'true'
+
     const area = await prisma.area.findUnique({
       where: { id: areaId },
       include: { tasks: true, resources: true }
@@ -158,25 +162,34 @@ export async function DELETE(request: NextRequest, { params }: Props) {
       )
     }
 
-    await prisma.archive.create({
-      data: {
-        name: area.name,
-        description: area.description,
-        type: 'AREA',
-        originalId: area.id,
-        archivedData: area
-      }
-    })
+    if (forceDelete) {
+      // Hard delete - permanently remove without archiving
+      await prisma.area.delete({
+        where: { id: areaId }
+      })
+      return NextResponse.json({ message: 'Area deleted permanently' })
+    } else {
+      // Archive the area instead of deleting
+      await prisma.archive.create({
+        data: {
+          name: area.name,
+          description: area.description,
+          type: 'AREA',
+          originalId: area.id,
+          archivedData: area
+        }
+      })
 
-    await prisma.area.delete({
-      where: { id: areaId }
-    })
+      await prisma.area.delete({
+        where: { id: areaId }
+      })
 
-    return NextResponse.json({ message: 'Area archived successfully' })
+      return NextResponse.json({ message: 'Area archived successfully' })
+    }
   } catch (error) {
-    console.error('Error archiving area:', error)
+    console.error('Error processing area deletion:', error)
     return NextResponse.json(
-      { error: 'Failed to archive area' },
+      { error: 'Failed to process area deletion' },
       { status: 500 }
     )
   }

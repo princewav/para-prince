@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, MapPin, FolderOpen, CheckSquare, FileText, Flag, MoreHorizontal, Trash2, Copy } from "lucide-react";
+import { Plus, MapPin, FolderOpen, CheckSquare, FileText, Flag, MoreHorizontal, Copy, Archive, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Priority } from "@/lib/types";
@@ -41,6 +41,7 @@ export default function AreasPage() {
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [areaToDelete, setAreaToDelete] = useState<Area | null>(null);
+  const [deleteAction, setDeleteAction] = useState<'archive' | 'delete'>('archive');
 
   const fetchAreas = async () => {
     try {
@@ -83,9 +84,27 @@ export default function AreasPage() {
     router.push(`/dashboard/areas/${areaId}`);
   };
 
-  const handleDeleteArea = async (areaId: number) => {
+  const handleArchiveArea = async (areaId: number) => {
     try {
       const response = await fetch(`/api/areas/${areaId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to archive area');
+      }
+      
+      // Remove area from state
+      setAreas(areas.filter(area => area.id !== areaId));
+      setAreaToDelete(null);
+    } catch (err) {
+      console.error('Failed to archive area:', err);
+    }
+  };
+
+  const handleDeleteArea = async (areaId: number) => {
+    try {
+      const response = await fetch(`/api/areas/${areaId}?force=true`, {
         method: 'DELETE',
       });
       
@@ -101,8 +120,15 @@ export default function AreasPage() {
     }
   };
 
+  const openArchiveDialog = (area: Area) => {
+    setAreaToDelete(area);
+    setDeleteAction('archive');
+    setDeleteDialogOpen(true);
+  };
+
   const openDeleteDialog = (area: Area) => {
     setAreaToDelete(area);
+    setDeleteAction('delete');
     setDeleteDialogOpen(true);
   };
 
@@ -245,6 +271,16 @@ export default function AreasPage() {
                         <DropdownMenuItem
                           onClick={(e) => {
                             e.stopPropagation();
+                            openArchiveDialog(area);
+                          }}
+                          className="text-amber-600 focus:text-amber-600 cursor-pointer"
+                        >
+                          <Archive className="h-4 w-4 mr-2" />
+                          Archive Area
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
                             openDeleteDialog(area);
                           }}
                           className="text-destructive focus:text-destructive cursor-pointer"
@@ -311,9 +347,21 @@ export default function AreasPage() {
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        onConfirm={() => areaToDelete && handleDeleteArea(areaToDelete.id)}
-        title="Delete Area"
-        description="Are you sure you want to delete this area?"
+        onConfirm={() => {
+          if (areaToDelete) {
+            if (deleteAction === 'archive') {
+              handleArchiveArea(areaToDelete.id);
+            } else {
+              handleDeleteArea(areaToDelete.id);
+            }
+          }
+        }}
+        title={deleteAction === 'archive' ? "Archive Area" : "Delete Area"}
+        description={
+          deleteAction === 'archive' 
+            ? "Are you sure you want to archive this area? It can be restored later from the archives."
+            : "Are you sure you want to permanently delete this area? This action cannot be undone."
+        }
         itemName={areaToDelete?.name || ''}
       />
     </div>
