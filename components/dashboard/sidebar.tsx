@@ -13,7 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Briefcase, Folder, Archive, Library, Flame } from 'lucide-react';
+import { Target, Folder, Archive, Library, Flame } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -57,7 +57,7 @@ export function Sidebar() {
                       : 'hover:bg-muted/50 active:bg-muted/70'
                   }`}
                 >
-                  <Briefcase className="h-5 w-5 shrink-0" />
+                  <Target className="h-5 w-5 shrink-0" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent side="right">
