@@ -193,7 +193,6 @@ export default function ProjectsPage() {
                   <td className="py-2 px-4">
                     {project.area ? (
                       <span className="inline-flex items-center gap-1 text-sm">
-                        <MapPin className="h-3 w-3 text-muted-foreground" />
                         {project.area.name}
                       </span>
                     ) : (
