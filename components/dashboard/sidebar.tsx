@@ -15,10 +15,16 @@ import {
 } from "@/components/ui/tooltip";
 import { Briefcase, Folder, Archive, Library, Flame } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Sidebar() {
   const sidebarWidth = 60;
+  const pathname = usePathname();
+  
+  const isActive = (path: string) => {
+    return pathname.startsWith(path);
+  };
 
   return (
     <TooltipProvider>
@@ -45,7 +51,11 @@ export function Sidebar() {
               <TooltipTrigger asChild>
                 <Link 
                   href="/dashboard/projects" 
-                  className="flex items-center justify-center w-10 h-10 hover:bg-muted/50 active:bg-muted/70 rounded-lg transition-all duration-200"
+                  className={`flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 ${
+                    isActive('/dashboard/projects') 
+                      ? 'bg-primary text-primary-foreground shadow-sm' 
+                      : 'hover:bg-muted/50 active:bg-muted/70'
+                  }`}
                 >
                   <Briefcase className="h-5 w-5 shrink-0" />
                 </Link>
@@ -58,7 +68,11 @@ export function Sidebar() {
               <TooltipTrigger asChild>
                 <Link 
                   href="/dashboard/areas" 
-                  className="flex items-center justify-center w-10 h-10 hover:bg-muted/50 active:bg-muted/70 rounded-lg transition-all duration-200"
+                  className={`flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 ${
+                    isActive('/dashboard/areas') 
+                      ? 'bg-primary text-primary-foreground shadow-sm' 
+                      : 'hover:bg-muted/50 active:bg-muted/70'
+                  }`}
                 >
                   <Folder className="h-5 w-5 shrink-0" />
                 </Link>
@@ -71,7 +85,11 @@ export function Sidebar() {
               <TooltipTrigger asChild>
                 <Link 
                   href="/dashboard/resources" 
-                  className="flex items-center justify-center w-10 h-10 hover:bg-muted/50 active:bg-muted/70 rounded-lg transition-all duration-200"
+                  className={`flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 ${
+                    isActive('/dashboard/resources') 
+                      ? 'bg-primary text-primary-foreground shadow-sm' 
+                      : 'hover:bg-muted/50 active:bg-muted/70'
+                  }`}
                 >
                   <Library className="h-5 w-5 shrink-0" />
                 </Link>
@@ -84,7 +102,11 @@ export function Sidebar() {
               <TooltipTrigger asChild>
                 <Link 
                   href="/dashboard/archives" 
-                  className="flex items-center justify-center w-10 h-10 hover:bg-muted/50 active:bg-muted/70 rounded-lg transition-all duration-200"
+                  className={`flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 ${
+                    isActive('/dashboard/archives') 
+                      ? 'bg-primary text-primary-foreground shadow-sm' 
+                      : 'hover:bg-muted/50 active:bg-muted/70'
+                  }`}
                 >
                   <Archive className="h-5 w-5 shrink-0" />
                 </Link>
