@@ -70,16 +70,18 @@ export async function PUT(request: NextRequest, { params }: Props) {
     const body = await request.json()
     const { name, description, status, priority, dueDate, areaId } = body
 
+    // Only include fields that are being updated
+    const updateData: any = {}
+    if (name !== undefined) updateData.name = name
+    if (description !== undefined) updateData.description = description
+    if (status !== undefined) updateData.status = status
+    if (priority !== undefined) updateData.priority = priority
+    if (dueDate !== undefined) updateData.dueDate = dueDate ? new Date(dueDate) : null
+    if (areaId !== undefined) updateData.areaId = areaId || null
+
     const project = await prisma.project.update({
       where: { id: projectId },
-      data: {
-        name,
-        description,
-        status,
-        priority,
-        dueDate: dueDate ? new Date(dueDate) : null,
-        areaId: areaId || null,
-      },
+      data: updateData,
       include: {
         area: true,
         tasks: {
