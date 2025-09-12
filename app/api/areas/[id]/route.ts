@@ -26,12 +26,27 @@ export async function GET(request: NextRequest, { params }: Props) {
             { dueDate: 'asc' }
           ]
         },
+        projects: {
+          include: {
+            _count: {
+              select: {
+                tasks: {
+                  where: { completed: false }
+                }
+              }
+            }
+          },
+          orderBy: {
+            updatedAt: 'desc'
+          }
+        },
         resources: true,
         _count: {
           select: {
             tasks: {
               where: { completed: false }
-            }
+            },
+            projects: true
           }
         }
       }
@@ -83,12 +98,27 @@ export async function PUT(request: NextRequest, { params }: Props) {
             { dueDate: 'asc' }
           ]
         },
+        projects: {
+          include: {
+            _count: {
+              select: {
+                tasks: {
+                  where: { completed: false }
+                }
+              }
+            }
+          },
+          orderBy: {
+            updatedAt: 'desc'
+          }
+        },
         resources: true,
         _count: {
           select: {
             tasks: {
               where: { completed: false }
-            }
+            },
+            projects: true
           }
         }
       }

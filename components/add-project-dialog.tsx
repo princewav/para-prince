@@ -31,9 +31,10 @@ interface Area {
 
 interface AddProjectDialogProps {
   onProjectAdded: () => void;
+  defaultAreaId?: number;
 }
 
-export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
+export function AddProjectDialog({ onProjectAdded, defaultAreaId }: AddProjectDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [areas, setAreas] = useState<Area[]>([]);
@@ -62,7 +63,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
     status: "IN_PROGRESS",
     priority: "",
     dueDate: "",
-    areaId: "",
+    areaId: defaultAreaId ? defaultAreaId.toString() : "",
   });
 
   useEffect(() => {
@@ -116,7 +117,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
         status: "IN_PROGRESS",
         priority: "",
         dueDate: "",
-        areaId: "",
+        areaId: defaultAreaId ? defaultAreaId.toString() : "",
       });
       onProjectAdded();
     } catch (error) {
