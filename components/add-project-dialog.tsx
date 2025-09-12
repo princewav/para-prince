@@ -224,6 +224,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
                     ? "Loading..." 
                     : "Select area..."
                 }
+                className="h-10 dark:bg-transparent"
               />
             </div>
             <div>

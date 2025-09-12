@@ -32,6 +32,7 @@ interface AreaComboboxProps {
   onCreateArea: (name: string) => Promise<Area>;
   disabled?: boolean;
   placeholder?: string;
+  className?: string;
 }
 
 export function AreaCombobox({
@@ -41,6 +42,7 @@ export function AreaCombobox({
   onCreateArea,
   disabled = false,
   placeholder = "Select area...",
+  className,
 }: AreaComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
@@ -75,7 +77,7 @@ export function AreaCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className={cn("w-full justify-between font-normal", className)}
           disabled={disabled}
         >
           {selectedArea ? selectedArea.name : placeholder}
