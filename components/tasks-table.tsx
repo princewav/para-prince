@@ -155,11 +155,20 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
+    // Optimistic update - immediately update the UI
+    const optimisticTask = { ...task, completed: !task.completed };
+    const optimisticTasks = tasks.map((t) => t.id === taskId ? optimisticTask : t);
+    setTasks(sortTasks(optimisticTasks));
+
     try {
       const updatedTask = await tasksApi.toggleComplete(taskId, !task.completed);
-      setTasks(tasks.map((t) => t.id === taskId ? updatedTask : t));
+      // Update with the actual response from server and resort
+      const updatedTasks = tasks.map((t) => t.id === taskId ? updatedTask : t);
+      setTasks(sortTasks(updatedTasks));
     } catch (err) {
       console.error('Failed to toggle task:', err);
+      // Revert optimistic update on error
+      setTasks(tasks);
     }
   };
 
