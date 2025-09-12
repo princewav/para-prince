@@ -176,12 +176,36 @@ export default function AreasPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, i) => (
-            <Card key={i} className="aspect-square animate-pulse">
-              <CardContent className="p-0 h-full">
-                <div className="bg-muted h-2/3 rounded-t-lg"></div>
-                <div className="p-4 space-y-2">
-                  <div className="h-4 bg-muted rounded"></div>
-                  <div className="h-3 bg-muted rounded w-3/4"></div>
+            <Card key={i} className="aspect-[5/3] animate-pulse overflow-hidden pt-0 pb-4">
+              <CardContent className="p-0 h-full flex flex-col">
+                {/* Image/Avatar Section - Top 2/3 */}
+                <div className="h-2/3 relative flex items-center justify-center overflow-hidden bg-muted">
+                  {/* Skeleton Avatar */}
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="h-16 w-16 mb-1 rounded-full bg-muted-foreground/20"></div>
+                    <div className="h-5 bg-muted-foreground/20 rounded w-20"></div>
+                  </div>
+                  
+                  {/* Skeleton Action Button */}
+                  <div className="absolute top-2 right-2 z-20">
+                    <div className="h-8 w-8 bg-muted-foreground/20 rounded"></div>
+                  </div>
+                </div>
+
+                {/* Info Section - Bottom 1/3 */}
+                <div className="h-1/3 p-4 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    {/* Priority Badge Skeleton */}
+                    <div className="flex items-center justify-between">
+                      <div className="h-5 bg-muted rounded-full w-16"></div>
+                    </div>
+                    
+                    {/* Stats Skeleton */}
+                    <div className="flex items-center justify-between">
+                      <div className="h-3 bg-muted rounded w-16"></div>
+                      <div className="h-3 bg-muted rounded w-12"></div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
