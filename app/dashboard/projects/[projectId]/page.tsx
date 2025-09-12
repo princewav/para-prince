@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { AreaCombobox } from "@/components/area-combobox";
-import { ArrowLeft, Calendar, AlertCircle, Flag, Plus, FileText, Check, List, Zap, MapPin, Edit } from "lucide-react";
+import { ArrowLeft, Calendar, AlertCircle, Flag, Plus, FileText, Check, List, Zap, MapPin, Edit, ExternalLink } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { projectsApi, tasksApi, areasApi } from "@/lib/api";
@@ -484,15 +484,31 @@ export default function ProjectPage() {
                     />
                   </div>
                 ) : (
-                  <span 
-                    className="text-sm font-medium cursor-pointer hover:bg-muted/20 px-1 py-0.5 rounded"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setEditingProjectField('areaId');
-                    }}
-                  >
-                    {project.area?.name || 'No area'}
-                  </span>
+                  <div className="flex items-center gap-1">
+                    <span 
+                      className="text-sm font-medium cursor-pointer hover:bg-muted/20 px-1 py-0.5 rounded"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingProjectField('areaId');
+                      }}
+                    >
+                      {project.area?.name || 'No area'}
+                    </span>
+                    {project.area && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-muted/50 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/dashboard/areas/${project.area?.id}`);
+                        }}
+                        title="View Area Details"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

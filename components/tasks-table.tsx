@@ -344,9 +344,21 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                   </td>
                   {showProjectColumn && (
                     <td className="p-1 h-14 align-middle leading-none">
-                      <span className="text-sm">
-                        {task.project?.name || 'No project'}
-                      </span>
+                      {task.project ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/dashboard/projects/${task.project?.id}`);
+                          }}
+                          className="text-sm text-left cursor-pointer hover:bg-muted/20 px-2 py-1 rounded -mx-2 -my-1 w-full hover:underline"
+                        >
+                          {task.project.name}
+                        </button>
+                      ) : (
+                        <span className="text-sm text-muted-foreground px-2">
+                          No project
+                        </span>
+                      )}
                     </td>
                   )}
                   <td
