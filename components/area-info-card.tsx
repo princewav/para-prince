@@ -5,7 +5,7 @@ import { Card as CardVariant, CardContent as CardContentVariant } from "@/compon
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Flag, Edit, Target, ListTodo, Book } from "lucide-react";
+import { Flag, Edit, Target, ListTodo, Library } from "lucide-react";
 import { useState } from "react";
 import { Priority } from "@/lib/types";
 import { getPriorityColor } from "@/lib/badge-utils";
@@ -121,12 +121,12 @@ export function AreaInfoCard({ area, onUpdate, stats }: AreaInfoCardProps) {
                   <span className="font-medium">{stats.projects}</span>
                 </div>
                 <div className="flex items-center gap-1 text-sm">
-                  <ListTodo className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">{stats.tasks}</span>
+                  <Library className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">{stats.resources}</span>
                 </div>
                 <div className="flex items-center gap-1 text-sm">
-                  <Book className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">{stats.resources}</span>
+                  <ListTodo className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">{stats.tasks}</span>
                 </div>
               </div>
             )}
