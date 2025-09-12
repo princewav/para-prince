@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Priority } from "@/lib/types";
 import { getPriorityColor } from "@/lib/badge-utils";
+import { AddAreaDialog } from "@/components/add-area-dialog";
 
 interface Area {
   id: number;
@@ -81,10 +82,12 @@ export default function AreasPage() {
             <h1 className="text-3xl font-bold">Areas</h1>
             <p className="text-muted-foreground mt-1">Manage your life areas and focus domains</p>
           </div>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Area
-          </Button>
+          <AddAreaDialog onAreaAdded={fetchAreas}>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              New Area
+            </Button>
+          </AddAreaDialog>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -110,10 +113,12 @@ export default function AreasPage() {
           <h1 className="text-3xl font-bold">Areas</h1>
           <p className="text-muted-foreground mt-1">Manage your life areas and focus domains</p>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          New Area
-        </Button>
+        <AddAreaDialog onAreaAdded={fetchAreas}>
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            New Area
+          </Button>
+        </AddAreaDialog>
       </div>
 
       {areas.length === 0 ? (
@@ -121,17 +126,19 @@ export default function AreasPage() {
           <MapPin className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-muted-foreground mb-2">No areas yet</h2>
           <p className="text-muted-foreground mb-4">Create your first area to organize your projects and tasks</p>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Create Area
-          </Button>
+          <AddAreaDialog onAreaAdded={fetchAreas}>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Create Area
+            </Button>
+          </AddAreaDialog>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {areas.map((area, index) => (
             <Card 
               key={area.id} 
-              className=" cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group overflow-hidden pt-0 pb-4"
+              className="aspect-[5/3] cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group overflow-hidden pt-0 pb-4"
               onClick={() => handleAreaClick(area.id)}
             >
               <CardContent className="p-0 h-full flex flex-col">
@@ -189,15 +196,17 @@ export default function AreasPage() {
           ))}
 
           {/* Add New Area Card */}
-          <Card className=" cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 group">
-            <CardContent className="p-0 h-full flex flex-col items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
-              <div className="rounded-full bg-muted group-hover:bg-primary/10 p-6 mb-4 transition-colors">
-                <Plus className="h-8 w-8" />
-              </div>
-              <h3 className="text-lg font-medium mb-1">New Area</h3>
-              <p className="text-sm text-center px-4">Create a new focus area</p>
-            </CardContent>
-          </Card>
+          <AddAreaDialog onAreaAdded={fetchAreas}>
+            <Card className="aspect-[5/3] cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 group">
+              <CardContent className="p-0 h-full flex flex-col items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
+                <div className="rounded-full bg-muted group-hover:bg-primary/10 p-6 mb-4 transition-colors">
+                  <Plus className="h-8 w-8" />
+                </div>
+                <h3 className="text-lg font-medium mb-1">New Area</h3>
+                <p className="text-sm text-center px-4">Create a new focus area</p>
+              </CardContent>
+            </Card>
+          </AddAreaDialog>
         </div>
       )}
     </div>
