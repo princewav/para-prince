@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AreaCombobox } from "@/components/area-combobox";
+import { capitalize } from "@/lib/utils";
 
 interface Area {
   id: number;
@@ -97,6 +98,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
         },
         body: JSON.stringify({
           ...formData,
+          name: capitalize(formData.name),
           dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : null,
           priority: formData.priority || null,
           areaId: formData.areaId ? parseInt(formData.areaId) : null,

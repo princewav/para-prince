@@ -17,6 +17,7 @@ import { useState, useEffect, useRef } from "react";
 import { projectsApi, tasksApi, areasApi } from "@/lib/api";
 import { ProjectWithTasks, TaskWithRelations, Priority, Energy, Context, ProjectStatus, AreaWithTasks } from "@/lib/types";
 import { getPriorityColor, getEnergyColor, getContextColor, getProjectStatusColor } from "@/lib/badge-utils";
+import { capitalize } from "@/lib/utils";
 
 export default function ProjectPage() {
   const router = useRouter();
@@ -108,7 +109,7 @@ export default function ProjectPage() {
     if (newTaskName) {
       try {
         const newTask = await tasksApi.create({
-          name: newTaskName,
+          name: capitalize(newTaskName),
           dueDate: newTaskDueDate || null,
           priority: newTaskPriority === "none" ? null : newTaskPriority,
           energy: newTaskEnergy === "none" ? null : newTaskEnergy,
@@ -172,7 +173,7 @@ export default function ProjectPage() {
       } else if (field === 'context') {
         updateData.context = value === 'none' ? null : value as Context;
       } else {
-        updateData[field] = value;
+        updateData[field] = field === 'name' ? capitalize(value) : value;
       }
 
       const updatedTask = await tasksApi.update(taskId, updateData);
@@ -221,7 +222,7 @@ export default function ProjectPage() {
       } else if (field === 'areaId') {
         updateData.areaId = value ? parseInt(value) : null;
       } else {
-        updateData[field] = value;
+        updateData[field] = field === 'name' ? capitalize(value || '') : value;
       }
 
       const updatedProject = await projectsApi.update(project.id, updateData);
