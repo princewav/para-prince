@@ -226,6 +226,10 @@ export default function ProjectPage() {
       }
 
       const updatedProject = await projectsApi.update(project.id, updateData);
+      // Preserve existing area if it wasn't being updated
+      if (field !== 'areaId' && project.area && !updatedProject.area) {
+        updatedProject.area = project.area;
+      }
       setProject(updatedProject);
     } catch (err) {
       console.error('Failed to update project:', err);
@@ -470,7 +474,7 @@ export default function ProjectPage() {
                   <div className="w-40" onClick={(e) => e.stopPropagation()}>
                     <AreaCombobox
                       areas={areas as any}
-                      value={((project as any).areaId)?.toString() || ''}
+                      value={project.area?.id?.toString() || ''}
                       onValueChange={(value) => {
                         handleEditProject('areaId', value);
                         setEditingProjectField(null);
@@ -487,7 +491,7 @@ export default function ProjectPage() {
                       setEditingProjectField('areaId');
                     }}
                   >
-                    {areas.find(a => a.id === (project as any).areaId)?.name || 'No area'}
+                    {project.area?.name || 'No area'}
                   </span>
                 )}
               </div>
