@@ -303,14 +303,14 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
             </thead>
             <tbody>
               {tasks.map((task) => (
-                <tr key={task.id} className="border-b last:border-b-0">
-                  <td className="p-1 h-14 align-middle leading-none text-center">
+                <tr key={task.id} className="border-b last:border-b-0 h-10">
+                  <td className="p-1 align-middle leading-none text-center">
                     <Checkbox
                       checked={task.completed}
                       onCheckedChange={() => handleToggleTask(task.id)}
                     />
                   </td>
-                  <td className="p-1 h-14 align-middle leading-none text-center">
+                  <td className="p-1 align-middle leading-none text-center">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -328,7 +328,7 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                     </Button>
                   </td>
                   <td
-                    className={`p-1 h-14 align-middle leading-none w-48 ${
+                    className={`p-1 align-middle leading-none w-48 ${
                       task.completed ? "line-through text-muted-foreground" : ""
                     }`}
                     onClick={() => startEditing(task.id, "name")}
@@ -360,7 +360,7 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                     )}
                   </td>
                   {showProjectColumn && (
-                    <td className="p-1 h-14 align-middle leading-none">
+                    <td className="p-1 align-middle leading-none">
                       {task.project ? (
                         <button
                           onClick={(e) => {
@@ -379,7 +379,7 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                     </td>
                   )}
                   <td
-                    className={`p-1 h-14 align-middle leading-none ${
+                    className={`p-1 align-middle leading-none ${
                       task.completed ? "line-through text-muted-foreground" : ""
                     }`}
                     onClick={() => startEditing(task.id, "dueDate")}
@@ -419,7 +419,7 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                     )}
                   </td>
                   <td
-                    className="p-1 h-14 align-middle leading-none text-center"
+                    className="p-1 align-middle leading-none text-center"
                     onClick={() => startEditing(task.id, "priority")}
                   >
                     {editingTask === task.id && editingField === "priority" ? (
@@ -455,7 +455,7 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                     )}
                   </td>
                   <td
-                    className="p-1 h-14 align-middle leading-none text-center"
+                    className="p-1 align-middle leading-none text-center"
                     onClick={() => startEditing(task.id, "energy")}
                   >
                     {editingTask === task.id && editingField === "energy" ? (
@@ -493,7 +493,7 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                     )}
                   </td>
                   <td
-                    className="p-1 h-14 align-middle leading-none text-center"
+                    className="p-1 align-middle leading-none text-center"
                     onClick={() => startEditing(task.id, "context")}
                   >
                     {editingTask === task.id && editingField === "context" ? (
@@ -536,15 +536,15 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
               ))}
               {isAddingTask && (
                 <tr ref={addTaskRowRef} className="border-b-0 bg-muted/20">
-                  <td className="p-1 h-14 align-middle leading-none text-center">
+                  <td className="p-1 align-middle leading-none text-center">
                     <div className="w-4 h-4 rounded-sm border-2 border-dashed border-muted-foreground/40 mx-auto"></div>
                   </td>
-                  <td className="p-1 h-14 align-middle leading-none text-center">
+                  <td className="p-1 align-middle leading-none text-center">
                     <div className="w-6 h-6 rounded border border-dashed border-muted-foreground/40 flex items-center justify-center mx-auto">
                       <FileText className="h-3 w-3 text-muted-foreground/40" />
                     </div>
                   </td>
-                  <td className="p-1 h-14 align-middle leading-none w-48">
+                  <td className="p-1 align-middle leading-none w-48">
                     <Input
                       placeholder="Enter task name..."
                       value={newTaskName}
@@ -555,11 +555,11 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                     />
                   </td>
                   {showProjectColumn && (
-                    <td className="p-1 h-14 align-middle leading-none">
+                    <td className="p-1 align-middle leading-none">
                       <span className="text-sm text-muted-foreground">—</span>
                     </td>
                   )}
-                  <td className="p-1 h-14 align-middle leading-none">
+                  <td className="p-1 align-middle leading-none">
                     <Input
                       type="date"
                       value={newTaskDueDate}
@@ -569,7 +569,7 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                       placeholder="Optional"
                     />
                   </td>
-                  <td className="p-1 h-14 align-middle leading-none text-center">
+                  <td className="p-1 align-middle leading-none text-center">
                     <Select
                       value={newTaskPriority || "none"}
                       onValueChange={(value) => setNewTaskPriority(value === "none" ? null : value as Priority)}
@@ -585,7 +585,7 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                       </SelectContent>
                     </Select>
                   </td>
-                  <td className="p-1 h-14 align-middle leading-none text-center">
+                  <td className="p-1 align-middle leading-none text-center">
                     <Select
                       value={newTaskEnergy || "none"}
                       onValueChange={(value) => setNewTaskEnergy(value === "none" ? null : value as Energy)}
@@ -601,7 +601,7 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                       </SelectContent>
                     </Select>
                   </td>
-                  <td className="p-1 h-14 align-middle leading-none text-center">
+                  <td className="p-1 align-middle leading-none text-center">
                     <Select
                       value={newTaskContext || "none"}
                       onValueChange={(value) => setNewTaskContext(value === "none" ? null : value as Context)}
