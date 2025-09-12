@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Flag, Plus, FileText, Check, List, Zap, MapPin } from "lucide-react";
+import { Calendar, Flag, Plus, FileText, Check, List, Zap, MapPin, Target } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { tasksApi } from "@/lib/api";
@@ -256,31 +256,48 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
             <thead>
               <tr className="border-b">
                 <th className="px-3 py-2 font-medium w-4 text-center" title="Completed">
-                  <Check className="h-4 w-4 mx-auto text-muted-foreground" />
+                  <div className="flex items-center justify-center">
+                    <Check className="h-4 w-4 text-muted-foreground" />
+                  </div>
                 </th>
                 <th className="px-3 py-2 font-medium w-4 text-center" title="Notes">
-                  <FileText className="h-4 w-4 mx-auto text-muted-foreground" />
+                  <div className="flex items-center justify-center">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  </div>
                 </th>
                 <th className="px-3 py-2 font-medium w-48" title="Task Name">
-                  <List className="h-4 w-4 mr-2 text-muted-foreground inline-block" />
-                  <span className="text-sm">Task</span>
+                  <div className="flex items-center">
+                    <List className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <span className="text-sm">Task</span>
+                  </div>
                 </th>
                 {showProjectColumn && (
                   <th className="px-3 py-2 font-medium w-32" title="Project">
-                    <span className="text-sm">Project</span>
+                    <div className="flex items-center">
+                      <Target className="h-4 w-4 mr-2 text-muted-foreground" />
+                      <span className="text-sm">Project</span>
+                    </div>
                   </th>
                 )}
                 <th className="px-3 py-2 font-medium w-32" title="Due Date">
-                  <Calendar className="h-4 w-4 mx-auto text-muted-foreground" />
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                  </div>
                 </th>
                 <th className="px-3 py-2 font-medium w-8 text-center" title="Priority">
-                  <Flag className="h-4 w-4 mx-auto text-muted-foreground" />
+                  <div className="flex items-center justify-center">
+                    <Flag className="h-4 w-4 text-muted-foreground" />
+                  </div>
                 </th>
                 <th className="px-3 py-2 font-medium w-12 text-center" title="Energy">
-                  <Zap className="h-4 w-4 mx-auto text-muted-foreground" />
+                  <div className="flex items-center justify-center">
+                    <Zap className="h-4 w-4 text-muted-foreground" />
+                  </div>
                 </th>
                 <th className="px-3 py-2 font-medium w-20 text-center" title="Context">
-                  <MapPin className="h-4 w-4 mx-auto text-muted-foreground" />
+                  <div className="flex items-center justify-center">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                  </div>
                 </th>
               </tr>
             </thead>
