@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { AddProjectDialog } from "@/components/add-project-dialog";
 import { Priority, ProjectStatus } from "@/lib/types";
 import { getStatusBadge, getPriorityBadge } from "@/lib/badge-utils";
+import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialog";
 
 interface Project {
   id: number;
@@ -42,6 +43,8 @@ export function ProjectsTable({ areaId, showAreaColumn = false, onProjectAdded }
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
 
   const fetchProjects = async () => {
     try {
@@ -79,6 +82,29 @@ export function ProjectsTable({ areaId, showAreaColumn = false, onProjectAdded }
     if (onProjectAdded) {
       onProjectAdded();
     }
+  };
+
+  const handleDeleteProject = async (projectId: number) => {
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete project');
+      }
+      
+      // Remove project from state
+      setProjects(projects.filter(project => project.id !== projectId));
+      setProjectToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete project:', err);
+    }
+  };
+
+  const openDeleteDialog = (project: Project) => {
+    setProjectToDelete(project);
+    setDeleteDialogOpen(true);
   };
 
   const getDaysLeft = (dueDate: string | undefined) => {
@@ -245,8 +271,11 @@ export function ProjectsTable({ areaId, showAreaColumn = false, onProjectAdded }
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-red-500 focus:text-red-500"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openDeleteDialog(project);
+                          }}
+                          className="text-destructive focus:text-destructive cursor-pointer"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete
@@ -260,6 +289,15 @@ export function ProjectsTable({ areaId, showAreaColumn = false, onProjectAdded }
           </tbody>
         </table>
       </div>
+      
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={() => projectToDelete && handleDeleteProject(projectToDelete.id)}
+        title="Delete Project"
+        description="Are you sure you want to delete this project?"
+        itemName={projectToDelete?.name || ''}
+      />
     </div>
   );
 }

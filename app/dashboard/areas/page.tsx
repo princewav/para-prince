@@ -4,12 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Plus, MapPin, FolderOpen, CheckSquare, FileText, Flag } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Plus, MapPin, FolderOpen, CheckSquare, FileText, Flag, MoreHorizontal, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Priority } from "@/lib/types";
 import { getPriorityColor } from "@/lib/badge-utils";
 import { AddAreaDialog } from "@/components/add-area-dialog";
+import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialog";
 
 interface Area {
   id: number;
@@ -32,6 +39,8 @@ export default function AreasPage() {
   const router = useRouter();
   const [areas, setAreas] = useState<Area[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [areaToDelete, setAreaToDelete] = useState<Area | null>(null);
 
   const fetchAreas = async () => {
     try {
@@ -72,6 +81,29 @@ export default function AreasPage() {
 
   const handleAreaClick = (areaId: number) => {
     router.push(`/dashboard/areas/${areaId}`);
+  };
+
+  const handleDeleteArea = async (areaId: number) => {
+    try {
+      const response = await fetch(`/api/areas/${areaId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete area');
+      }
+      
+      // Remove area from state
+      setAreas(areas.filter(area => area.id !== areaId));
+      setAreaToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete area:', err);
+    }
+  };
+
+  const openDeleteDialog = (area: Area) => {
+    setAreaToDelete(area);
+    setDeleteDialogOpen(true);
   };
 
   if (loading) {
@@ -157,6 +189,35 @@ export default function AreasPage() {
                   </div>
                   {/* Decorative pattern overlay */}
                   <div className="absolute inset-0 bg-black/5 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:20px_20px]"></div>
+                  
+                  {/* Action Button */}
+                  <div className="absolute top-2 right-2 z-20">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/10"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Open menu</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openDeleteDialog(area);
+                          }}
+                          className="text-destructive focus:text-destructive cursor-pointer"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Area
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
 
                 {/* Info Section - Bottom 1/3 */}
@@ -209,6 +270,15 @@ export default function AreasPage() {
           </AddAreaDialog>
         </div>
       )}
+      
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={() => areaToDelete && handleDeleteArea(areaToDelete.id)}
+        title="Delete Area"
+        description="Are you sure you want to delete this area?"
+        itemName={areaToDelete?.name || ''}
+      />
     </div>
   );
 }

@@ -5,13 +5,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Flag, Plus, FileText, Check, List, Zap, MapPin, Target } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Calendar, Flag, Plus, FileText, Check, List, Zap, MapPin, Target, MoreHorizontal, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { tasksApi } from "@/lib/api";
 import { TaskWithRelations, Priority, Energy, Context } from "@/lib/types";
 import { getPriorityColor, getEnergyColor, getContextColor } from "@/lib/badge-utils";
 import { capitalize } from "@/lib/utils";
+import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialog";
 
 interface TasksTableProps {
   projectId?: number;
@@ -34,6 +41,8 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
   const [editingTask, setEditingTask] = useState<number | null>(null);
   const [editingField, setEditingField] = useState<string | null>(null);
   const addTaskRowRef = useRef<HTMLTableRowElement>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<TaskWithRelations | null>(null);
 
   const sortTasks = (tasksToSort: TaskWithRelations[]) => {
     const priorityOrder: Record<Priority, number> = { P1: 1, P2: 2, P3: 3 };
@@ -232,6 +241,29 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
     return '';
   };
 
+  const handleDeleteTask = async (taskId: number) => {
+    try {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete task');
+      }
+      
+      // Remove task from state
+      setTasks(tasks.filter(task => task.id !== taskId));
+      setTaskToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete task:', err);
+    }
+  };
+
+  const openDeleteDialog = (task: TaskWithRelations) => {
+    setTaskToDelete(task);
+    setDeleteDialogOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="text-center py-8">Loading tasks...</div>
@@ -299,6 +331,9 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                     <MapPin className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </th>
+                <th className="px-3 py-2 font-medium w-12 text-center" title="Actions">
+                  <span className="sr-only">Actions</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -352,7 +387,7 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                         autoFocus
                       />
                     ) : (
-                      <div className="cursor-pointer hover:bg-muted/20 px-2 py-1 rounded -mx-2 -my-1 w-full overflow-hidden">
+                      <div className="cursor-pointer hover:bg-muted/20 px-2 py-1 rounded  w-full overflow-hidden">
                         <span className="block truncate" title={task.name}>
                           {task.name}
                         </span>
@@ -367,7 +402,7 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                             e.stopPropagation();
                             router.push(`/dashboard/projects/${task.project?.id}`);
                           }}
-                          className="text-sm text-left cursor-pointer hover:bg-muted/20 px-2 py-1 rounded -mx-2 -my-1 w-full hover:underline"
+                          className="text-sm text-left cursor-pointer hover:bg-muted/20 px-2 py-1 rounded  w-full hover:underline"
                         >
                           {task.project.name}
                         </button>
@@ -404,7 +439,7 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                         autoFocus
                       />
                     ) : (
-                      <span className="cursor-pointer hover:bg-muted/20 px-2 py-1 rounded -mx-2 -my-1">
+                      <span className="cursor-pointer hover:bg-muted/20 px-2 py-1 rounded ">
                         {task.dueDate ? (
                           <span className={getDueDateClass(new Date(task.dueDate).toISOString().split('T')[0])}>
                             <span>{new Date(task.dueDate).toLocaleDateString()}</span>
@@ -532,6 +567,33 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                       </span>
                     )}
                   </td>
+                  <td className="p-1 align-middle leading-none text-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 hover:bg-muted"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Open menu</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openDeleteDialog(task);
+                          }}
+                          className="text-destructive focus:text-destructive cursor-pointer"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Task
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </td>
                 </tr>
               ))}
               {isAddingTask && (
@@ -618,6 +680,9 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                       </SelectContent>
                     </Select>
                   </td>
+                  <td className="p-1 align-middle leading-none text-center">
+                    <div className="w-8 h-8"></div>
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -640,6 +705,15 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
           )}
         </CardContent>
       </Card>
+
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={() => taskToDelete && handleDeleteTask(taskToDelete.id)}
+        title="Delete Task"
+        description="Are you sure you want to delete this task?"
+        itemName={taskToDelete?.name || ''}
+      />
     </div>
   );
 }
