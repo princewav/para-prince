@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pencil, Trash2, Calendar, Flag, MapPin, AlertCircle, Target } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Calendar, Flag, MapPin, AlertCircle, Target, Copy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AddProjectDialog } from "@/components/add-project-dialog";
@@ -105,6 +105,39 @@ export function ProjectsTable({ areaId, showAreaColumn = false, onProjectAdded }
   const openDeleteDialog = (project: Project) => {
     setProjectToDelete(project);
     setDeleteDialogOpen(true);
+  };
+
+  const handleDuplicateProject = async (project: Project) => {
+    try {
+      const duplicatedProject = {
+        name: `${project.name} (Copy)`,
+        description: project.description,
+        status: project.status,
+        priority: project.priority,
+        dueDate: project.dueDate,
+        areaId: project.area?.id || null,
+      };
+
+      const response = await fetch('/api/projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(duplicatedProject),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to duplicate project');
+      }
+
+      const newProject = await response.json();
+      setProjects([...projects, newProject]);
+      if (onProjectAdded) {
+        onProjectAdded();
+      }
+    } catch (err) {
+      console.error('Failed to duplicate project:', err);
+    }
   };
 
   const getDaysLeft = (dueDate: string | undefined) => {
@@ -269,6 +302,16 @@ export function ProjectsTable({ areaId, showAreaColumn = false, onProjectAdded }
                         <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
                           <Pencil className="mr-2 h-4 w-4" />
                           Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDuplicateProject(project);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Copy className="mr-2 h-4 w-4" />
+                          Duplicate Project
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={(e) => {

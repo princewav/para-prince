@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar, Flag, Plus, FileText, Check, List, Zap, MapPin, Target, MoreHorizontal, Trash2 } from "lucide-react";
+import { Calendar, Flag, Plus, FileText, Check, List, Zap, MapPin, Target, MoreHorizontal, Trash2, Copy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { tasksApi } from "@/lib/api";
@@ -264,6 +264,40 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
     setDeleteDialogOpen(true);
   };
 
+  const handleDuplicateTask = async (task: TaskWithRelations) => {
+    try {
+      const duplicatedTask = {
+        name: `${task.name} (Copy)`,
+        description: task.description,
+        status: task.status,
+        priority: task.priority,
+        energy: task.energy,
+        context: task.context,
+        notes: task.notes,
+        dueDate: task.dueDate,
+        projectId: task.projectId,
+        areaId: task.areaId,
+      };
+
+      const response = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(duplicatedTask),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to duplicate task');
+      }
+
+      const newTask = await response.json();
+      setTasks([...tasks, newTask]);
+    } catch (err) {
+      console.error('Failed to duplicate task:', err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="text-center py-8">Loading tasks...</div>
@@ -387,8 +421,8 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                         autoFocus
                       />
                     ) : (
-                      <div className="cursor-pointer hover:bg-muted/20 px-2 py-1 rounded  w-full overflow-hidden">
-                        <span className="block truncate" title={task.name}>
+                      <div className="cursor-pointer hover:bg-muted/20 px-2 py-1 rounded  w-full overflow-hidden rounded-sm">
+                        <span className="block truncate py-1 " title={task.name}>
                           {task.name}
                         </span>
                       </div>
@@ -581,6 +615,16 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDuplicateTask(task);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Copy className="h-4 w-4 mr-2" />
+                          Duplicate Task
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={(e) => {
                             e.stopPropagation();

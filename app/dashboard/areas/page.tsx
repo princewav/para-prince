@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, MapPin, FolderOpen, CheckSquare, FileText, Flag, MoreHorizontal, Trash2 } from "lucide-react";
+import { Plus, MapPin, FolderOpen, CheckSquare, FileText, Flag, MoreHorizontal, Trash2, Copy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Priority } from "@/lib/types";
@@ -104,6 +104,33 @@ export default function AreasPage() {
   const openDeleteDialog = (area: Area) => {
     setAreaToDelete(area);
     setDeleteDialogOpen(true);
+  };
+
+  const handleDuplicateArea = async (area: Area) => {
+    try {
+      const duplicatedArea = {
+        name: `${area.name} (Copy)`,
+        description: area.description,
+        priority: area.priority,
+      };
+
+      const response = await fetch('/api/areas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(duplicatedArea),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to duplicate area');
+      }
+
+      const newArea = await response.json();
+      setAreas([...areas, newArea]);
+    } catch (err) {
+      console.error('Failed to duplicate area:', err);
+    }
   };
 
   if (loading) {
@@ -205,6 +232,16 @@ export default function AreasPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDuplicateArea(area);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Copy className="h-4 w-4 mr-2" />
+                          Duplicate Area
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={(e) => {
                             e.stopPropagation();
