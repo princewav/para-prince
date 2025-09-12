@@ -131,7 +131,7 @@ export default function AreasPage() {
           {areas.map((area, index) => (
             <Card 
               key={area.id} 
-              className="aspect-square cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group overflow-hidden"
+              className=" cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group overflow-hidden pt-0 pb-4"
               onClick={() => handleAreaClick(area.id)}
             >
               <CardContent className="p-0 h-full flex flex-col">
@@ -139,7 +139,7 @@ export default function AreasPage() {
                 <div className="h-2/3 relative flex items-center justify-center overflow-hidden">
                   <div className={`absolute inset-0 ${getAreaColor(index)} opacity-90`}></div>
                   <div className="relative z-10 flex flex-col items-center text-white">
-                    <Avatar className="h-16 w-16 mb-3 border-2 border-white/20 bg-white/10">
+                    <Avatar className="h-16 w-16 mb-1 border-2 border-white/20 bg-white/10">
                       <AvatarFallback className="bg-transparent text-white text-lg font-bold">
                         {getAreaInitials(area.name)}
                       </AvatarFallback>
@@ -189,7 +189,7 @@ export default function AreasPage() {
           ))}
 
           {/* Add New Area Card */}
-          <Card className="aspect-square cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 group">
+          <Card className=" cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 group">
             <CardContent className="p-0 h-full flex flex-col items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
               <div className="rounded-full bg-muted group-hover:bg-primary/10 p-6 mb-4 transition-colors">
                 <Plus className="h-8 w-8" />
