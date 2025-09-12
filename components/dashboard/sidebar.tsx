@@ -85,36 +85,22 @@ export function Sidebar() {
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link
-                  href="/dashboard/resources"
-                  className={`flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 ${
-                    isActive("/dashboard/resources")
-                      ? "bg-primary/90 hover:bg-primary text-primary-foreground shadow-sm"
-                      : "hover:bg-muted/50 active:bg-muted/70"
-                  }`}
-                >
-                  <Library className="h-5 w-5 shrink-0" />
-                </Link>
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg opacity-50 cursor-not-allowed">
+                  <Library className="h-5 w-5 shrink-0 text-muted-foreground" />
+                </div>
               </TooltipTrigger>
               <TooltipContent side="right">
-                <p>Resources</p>
+                <p>Resources (Coming Soon)</p>
               </TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link
-                  href="/dashboard/archives"
-                  className={`flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 ${
-                    isActive("/dashboard/archives")
-                      ? "bg-primary/90 hover:bg-primary text-primary-foreground shadow-sm"
-                      : "hover:bg-muted/50 active:bg-muted/70"
-                  }`}
-                >
-                  <Archive className="h-5 w-5 shrink-0" />
-                </Link>
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg opacity-50 cursor-not-allowed">
+                  <Archive className="h-5 w-5 shrink-0 text-muted-foreground" />
+                </div>
               </TooltipTrigger>
               <TooltipContent side="right">
-                <p>Archives</p>
+                <p>Archives (Coming Soon)</p>
               </TooltipContent>
             </Tooltip>
 
