@@ -1,9 +1,10 @@
-import { PrismaClient, Priority, Energy, Context, ProjectStatus } from '@prisma/client'
+import { PrismaClient, Priority, Energy, Context, ProjectStatus, FavoriteType } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
 async function main() {
   // Clear existing data
+  await prisma.favorite.deleteMany()
   await prisma.task.deleteMany()
   await prisma.resource.deleteMany()
   await prisma.project.deleteMany()

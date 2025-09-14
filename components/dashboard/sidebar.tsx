@@ -19,6 +19,8 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { FavoritesMenu } from "@/components/favorites-menu";
+import { FavoritesProvider } from "@/contexts/favorites-context";
 
 export function Sidebar() {
   const sidebarWidth = 60;
@@ -29,11 +31,12 @@ export function Sidebar() {
   };
 
   return (
-    <TooltipProvider>
-      <Card
-        className="h-screen flex flex-col rounded-none transition-colors duration-200 fixed left-0 top-0 z-40 pb-0 gap-2 pt-2"
-        style={{ width: `${sidebarWidth}px` }}
-      >
+    <FavoritesProvider>
+      <TooltipProvider>
+        <Card
+          className="h-screen flex flex-col rounded-none transition-colors duration-200 fixed left-0 top-0 z-40 pb-0 gap-2 pt-2"
+          style={{ width: `${sidebarWidth}px` }}
+        >
         <CardHeader className="p-1 flex items-center justify-center">
           <Tooltip>
             <TooltipTrigger asChild>
@@ -125,6 +128,9 @@ export function Sidebar() {
                 <p>Tasks</p>
               </TooltipContent>
             </Tooltip>
+
+            {/* Favorites */}
+            <FavoritesMenu />
           </nav>
         </CardContent>
         <div className="border-t flex justify-center items-center p-1.5">
@@ -139,5 +145,6 @@ export function Sidebar() {
         </div>
       </Card>
     </TooltipProvider>
+    </FavoritesProvider>
   );
 }

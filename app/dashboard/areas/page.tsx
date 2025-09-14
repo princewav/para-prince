@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Plus, MapPin, FolderOpen, CheckSquare, FileText, Flag, MoreHorizontal, Copy, Archive, Trash2 } from "lucide-react";
+import { StarButton } from "@/components/star-button";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Priority } from "@/lib/types";
@@ -267,14 +268,20 @@ export default function AreasPage() {
                   {/* Decorative pattern overlay */}
                   <div className="absolute inset-0 bg-black/5 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:20px_20px]"></div>
                   
-                  {/* Action Button */}
-                  <div className="absolute top-2 right-2 z-20">
+                  {/* Action Buttons */}
+                  <div className="absolute top-2 right-2 z-20 flex gap-1">
+                    <StarButton 
+                      itemId={area.id}
+                      itemType="AREA"
+                      size="sm"
+                      className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/10"
+                    />
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/10"
+                          className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/10"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <MoreHorizontal className="h-4 w-4" />

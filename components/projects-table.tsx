@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Calendar, Flag, MapPin, AlertCircle, Target, Copy, Archive, Trash2 } from "lucide-react";
+import { StarButton } from "@/components/star-button";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AddProjectDialog } from "@/components/add-project-dialog";
@@ -314,18 +315,25 @@ export function ProjectsTable({ areaId, showAreaColumn = false, onProjectAdded }
                   <td className="py-2 px-4">
                     {getPriorityBadge(project.priority)}
                   </td>
-                  <td className="py-2 px-4 text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => e.stopPropagation()}
-                          className="hover:bg-muted"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
+                  <td className="py-2 px-4">
+                    <div className="flex items-center justify-center gap-1">
+                      <StarButton 
+                        itemId={project.id}
+                        itemType="PROJECT"
+                        size="sm"
+                        className="h-7 w-7"
+                      />
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => e.stopPropagation()}
+                            className="h-7 w-7 hover:bg-muted"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
                           onClick={(e) => {
@@ -359,6 +367,7 @@ export function ProjectsTable({ areaId, showAreaColumn = false, onProjectAdded }
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
+                    </div>
                   </td>
                 </tr>
               ))

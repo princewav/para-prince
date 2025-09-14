@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Calendar, Flag, Plus, FileText, Check, List, Zap, MapPin, Target, MoreHorizontal, Trash2, Copy } from "lucide-react";
+import { StarButton } from "@/components/star-button";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { tasksApi } from "@/lib/api";
@@ -616,19 +617,26 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                       </span>
                     )}
                   </td>
-                  <td className="p-1 align-middle leading-none text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 hover:bg-muted"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
+                  <td className="p-1 align-middle leading-none">
+                    <div className="flex items-center justify-center gap-1">
+                      <StarButton 
+                        itemId={task.id}
+                        itemType="TASK"
+                        size="sm"
+                        className="h-6 w-6"
+                      />
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 hover:bg-muted"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
                           onClick={(e) => {
@@ -652,6 +660,7 @@ export function TasksTable({ projectId, areaId, title = "Tasks", showProjectColu
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
+                    </div>
                   </td>
                 </tr>
               ))}
